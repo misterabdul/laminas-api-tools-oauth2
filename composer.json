@@ -1,21 +1,20 @@
 {
-    "name": "aqilix/zf3-apigilty-oauth2",
-    "description": "Start API Development using ZF3, Apigility with OAuth2 support",
+    "name": "misterabdul/laminas-api-tools-oauth2",
+    "description": "Start API Development using Laminas API Tools with OAuth2 support",
     "type": "library",
     "license": "BSD-3-Clause",
     "keywords": [
         "api",
-        "apigility",
-        "zf3",
+        "api-tools",
+        "laminas",
         "oauth2",
-        "php5.6",
-        "php7"
+        "php8.0"
     ],
-    "homepage": "https://aqilix.com/",
+    "homepage": "https://github.com/misterabdul/laminas-api-tools-oauth2",
     "support": {
-        "email": "dolly.aswin@aqilix.com",
-        "source": "https://github.com/aqilix/zf3-apigilty-oauth2",
-        "issues": "https://github.com/aqilix/zf3-apigilty-oauth2/issues"
+        "email": "abdoelrachmad@gmail.com",
+        "source": "https://github.com/misterabdul/laminas-api-tools-oauth2",
+        "issues": "https://github.com/misterabdul/laminas-api-tools-oauth2/issues"
     },
     "config": {
         "process-timeout": 5000
