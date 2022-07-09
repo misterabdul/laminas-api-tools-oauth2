@@ -1,6 +1,15 @@
 <?php
 return [
     'doctrine' => [
+        'eventmanager' => [
+            'orm_default' => [
+                'subscribers' => [
+                    // pick any listeners you need
+                    'Gedmo\Timestampable\TimestampableListener',
+                    'Gedmo\SoftDeleteable\SoftDeleteableListener'
+                ],
+            ],
+        ],
         'driver' => [
             'aqilix_oauth2_entity' => [
                 'class' => 'Doctrine\ORM\Mapping\Driver\XmlDriver',
@@ -13,5 +22,12 @@ return [
                 ]
             ]
         ],
+        'configuration' => [
+            'orm_default' => [
+                'filters' => [
+                    'soft-deleteable' => 'Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter'
+                ]
+            ]
+        ]
     ]
 ];
