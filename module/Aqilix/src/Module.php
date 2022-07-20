@@ -1,25 +1,28 @@
 <?php
-/**
- * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014-2016 Zend Technologies USA Inc. (http://www.zend.com)
- */
 
 namespace Aqilix;
 
-use Zend\Mvc\MvcEvent;
+use Laminas\Stdlib\ArrayUtils;
 
 class Module
 {
-    public function onBootstrap(MvcEvent $mvcEvent)
+    /**
+     * @param  \Laminas\Mvc\MvcEvent  $ev
+     * @return void
+     */
+    public function onBootstrap($ev)
     {
-        $serviceManager = $mvcEvent->getApplication()->getServiceManager();
-        $eventManager   = $mvcEvent->getApplication()->getEventManager();
+        $serviceManager = $ev->getApplication()->getServiceManager();
+        $eventManager = $ev->getApplication()->getEventManager();
         $em = $serviceManager->get('doctrine.entitymanager.orm_default');
         // enable soft-deletable
         $em->getFilters()
-           ->enable('soft-deleteable');
+            ->enable('soft-deleteable');
     }
 
+    /**
+     * @return array
+     */
     public function getConfig()
     {
         $config = [];
@@ -30,7 +33,7 @@ class Module
 
         // merge all module config options
         foreach ($configFiles as $configFile) {
-            $config = \Zend\Stdlib\ArrayUtils::merge($config, include $configFile, true);
+            $config = ArrayUtils::merge($config, include $configFile, true);
         }
 
         return $config;

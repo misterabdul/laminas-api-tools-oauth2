@@ -1,7 +1,8 @@
 <?php
+
 namespace User\V1\Rest\Profile;
 
-use Zend\Paginator\Paginator;
+use Laminas\Paginator\Paginator;
 
 class ProfileCollection extends Paginator
 {

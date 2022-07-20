@@ -1,30 +1,48 @@
 <?php
+
 namespace User\V1\Rpc\ResetPasswordNewPassword;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Json\Json;
-use ZF\ApiProblem\ApiProblemResponse;
-use ZF\ApiProblem\ApiProblem;
-use ZF\Hal\View\HalJsonModel;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\ApiTools\Hal\View\HalJsonModel;
+use Laminas\Json\Json;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class ResetPasswordNewPasswordController extends AbstractActionController
 {
+    /**
+     * @var \Laminas\InputFilter\InputFilterInterface
+     */
     protected $confirmNewPasswordValidator;
 
+    /**
+     * @var \User\V1\Service\ResetPassword
+     */
     protected $resetPasswordService;
 
-    public function __construct($confirmNewPasswordValidator, $resetPasswordService)
-    {
-        $this->setConfirmNewPasswordValidator($confirmNewPasswordValidator);
-        $this->setResetPasswordService($resetPasswordService);
+    /**
+     * @param  \Laminas\InputFilter\InputFilterInterface  $confirmNewPasswordValidator
+     * @param  \User\V1\Service\ResetPassword
+     */
+    public function __construct(
+        $confirmNewPasswordValidator,
+        $resetPasswordService
+    ) {
+        $this->confirmNewPasswordValidator = $confirmNewPasswordValidator;
+        $this->resetPasswordService = $resetPasswordService;
     }
 
+    /**
+     * @return mixed
+     */
     public function resetPasswordNewPasswordAction()
     {
-        $this->getConfirmNewPasswordValidator()->setData(Json::decode($this->getRequest()->getContent(), true));
         try {
-            $resetPassword = $this->getResetPasswordService();
-            $resetPassword->reset($this->getConfirmNewPasswordValidator()->getValues());
+            $this->confirmNewPasswordValidator
+                ->setData(Json::decode($this->getRequest()->getContent(), true));
+            $this->resetPasswordService
+                ->reset($this->confirmNewPasswordValidator->getValues());
+
             return new HalJsonModel([]);
         } catch (\Exception $e) {
             return new ApiProblemResponse(new ApiProblem(
@@ -35,37 +53,5 @@ class ResetPasswordNewPasswordController extends AbstractActionController
                 ['validation_messages' => ['resetPasswordKey' => [$e->getMessage()]]]
             ));
         }
-    }
-
-    /**
-     * @return the $confirmNewPasswordValidator
-     */
-    public function getConfirmNewPasswordValidator()
-    {
-        return $this->confirmNewPasswordValidator;
-    }
-
-    /**
-     * @param field_type $confirmNewPasswordValidator
-     */
-    public function setConfirmNewPasswordValidator($confirmNewPasswordValidator)
-    {
-        $this->confirmNewPasswordValidator = $confirmNewPasswordValidator;
-    }
-
-    /**
-     * @return the $resetPasswordService
-     */
-    public function getResetPasswordService()
-    {
-        return $this->resetPasswordService;
-    }
-
-    /**
-     * @param field_type $resetPasswordService
-     */
-    public function setResetPasswordService($resetPasswordService)
-    {
-        $this->resetPasswordService = $resetPasswordService;
     }
 }

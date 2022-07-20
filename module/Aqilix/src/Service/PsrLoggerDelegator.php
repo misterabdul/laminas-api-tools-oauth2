@@ -1,11 +1,10 @@
 <?php
+
 namespace Aqilix\Service;
 
-use Interop\Container\ContainerInterface;
-use Zend\Log\PsrLoggerAdapter;
-use Zend\ServiceManager\DelegatorFactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
 use Aqilix\Log\Processor\PsrPlaceholder;
+use Laminas\Log\PsrLoggerAdapter;
+use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 
 /**
  * Psr Logger Delegator
@@ -15,30 +14,16 @@ use Aqilix\Log\Processor\PsrPlaceholder;
 class PsrLoggerDelegator implements DelegatorFactoryInterface
 {
     /**
-     * @param ContainerInterface $container
-     * @param                    $requestedName
-     * @param callable           $callback
-     * @param array|null         $options
-     * @return PsrLoggerAdapter
+     * @param  \Psr\Container\ContainerInterface  $container
+     * @param  string  $name
+     * @param  callable  $callback
+     * @param  array|null  $options
+     * @return object
+     * @throws \Laminas\ServiceManager\Exception\ServiceNotFoundException If unable to resolve the service.
+     * @throws \Laminas\ServiceManager\Exception\ServiceNotCreatedException If an exception is raised when creating a service.
+     * @throws \Psr\Container\ContainerExceptionInterface If any other error occurs.
      */
-    public function __invoke(ContainerInterface $container, $requestedName, callable $callback, array $options = null)
-    {
-        $zendLogLogger = $callback();
-        $zendLogLogger->addProcessor(new PsrPlaceholder());
-        $psrLogger = new PsrLoggerAdapter($zendLogLogger);
-        return $psrLogger;
-    }
-
-    /**
-     * SM2 Compatibility
-     *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param string                  $name
-     * @param string                  $requestedName
-     * @param callable                $callback
-     * @return mixed
-     */
-    public function createDelegatorWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName, $callback)
+    public function __invoke($container, $name, $callback, $options = null)
     {
         $zendLogLogger = $callback();
         $zendLogLogger->addProcessor(new PsrPlaceholder());

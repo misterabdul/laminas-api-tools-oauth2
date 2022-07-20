@@ -1,13 +1,15 @@
 <?php
+
 return [
     'project' => [
         'sites' => [
-           'activation_url' => 'http://aqilix.xyz/user/activation/:code',
-           'contact_us' => 'https://aqilix.com'
+            'reset_password_url'    => 'https://example.com/user/resetpassword/:code',
+            'activation_url'        => 'https://example.com/user/activation/:code',
+            'contact_us'            => 'https://example.com'
         ],
         'php_process' => [
-           'php_binary' => '/usr/bin/php',
-           'script' => 'public/index.php'
-        ]
+            'php_binary'    => '/usr/bin/php',
+            'script'        => __DIR__ . '/../../public/index.php',
+        ],
     ],
 ];

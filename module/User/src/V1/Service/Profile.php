@@ -1,61 +1,23 @@
 <?php
+
 namespace User\V1\Service;
 
+use Laminas\EventManager\EventManagerAwareTrait;
 use User\V1\ProfileEvent;
-use Zend\EventManager\EventManagerAwareTrait;
-use User\Mapper\UserProfile as UserProfileMapper;
 
 class Profile
 {
     use EventManagerAwareTrait;
 
     /**
-     * @var \User\V1\ProfileEvent
-     */
-    protected $profileEvent;
-
-    /**
      * @var \User\Mapper\UserProfile
      */
     protected $userProfileMapper;
 
-    public function __construct(UserProfileMapper $userProfileMapper)
-    {
-        $this->setUserProfileMapper($userProfileMapper);
-    }
-
     /**
-     * @return \User\V1\ProfileEvent
+     * @param  \User\Mapper\UserProfile  $userProfileMapper
      */
-    public function getProfileEvent()
-    {
-        if ($this->profileEvent == null) {
-            $this->profileEvent = new ProfileEvent();
-        }
-
-        return $this->profileEvent;
-    }
-
-    /**
-     * @param ProfileEvent $signupEvent
-     */
-    public function setProfileEvent(ProfileEvent $profileEvent)
-    {
-        $this->profileEvent = $profileEvent;
-    }
-
-    /**
-     * @return the $userProfileMapper
-     */
-    public function getUserProfileMapper()
-    {
-        return $this->userProfileMapper;
-    }
-
-    /**
-     * @param UserProfileMapper $userProfileMapper
-     */
-    public function setUserProfileMapper(UserProfileMapper $userProfileMapper)
+    public function __construct($userProfileMapper)
     {
         $this->userProfileMapper = $userProfileMapper;
     }
@@ -63,12 +25,12 @@ class Profile
     /**
      * Update User Profile
      *
-     * @param \User\Entity\UserProfile  $userProfile
-     * @param array                     $updateData
+     * @param  \User\Entity\UserProfile  $userProfile
+     * @param  \Laminas\InputFilter\InputFilterInterface  $inputFilter
      */
     public function update($userProfile, $inputFilter)
     {
-        $profileEvent = $this->getProfileEvent();
+        $profileEvent = new ProfileEvent();
         $profileEvent->setUserProfileEntity($userProfile);
         $profileEvent->setUpdateData($inputFilter->getValues());
         $profileEvent->setInputFilter($inputFilter);

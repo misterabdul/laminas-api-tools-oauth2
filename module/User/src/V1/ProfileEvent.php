@@ -2,28 +2,21 @@
 
 namespace User\V1;
 
-use Zend\EventManager\Event;
-use Aqilix\ORM\Entity\EntityInterface;
-use Zend\InputFilter\InputFilterInterface;
-use \Exception;
+use Laminas\EventManager\Event;
 
 class ProfileEvent extends Event
 {
-    /**#@+
-     * Profile events triggered by eventmanager
-     */
-    const EVENT_UPDATE_PROFILE  = 'update.profile';
-    const EVENT_UPDATE_PROFILE_ERROR   = 'update.profile.error';
-    const EVENT_UPDATE_PROFILE_SUCCESS = 'update.profile.success';
-    /**#@-*/
+    public const EVENT_UPDATE_PROFILE = 'update.profile';
+    public const EVENT_UPDATE_PROFILE_ERROR = 'update.profile.error';
+    public const EVENT_UPDATE_PROFILE_SUCCESS = 'update.profile.success';
 
     /**
-     * @var User\Entity\UserProfile
+     * @var \User\Entity\UserProfile
      */
     protected $userProfileEntity;
 
     /**
-     * @var Zend\InputFilter\InputFilterInterface
+     * @var \Laminas\InputFilter\InputFilterInterface
      */
     protected $inputFilter;
 
@@ -37,8 +30,11 @@ class ProfileEvent extends Event
      */
     protected $exception;
 
+
     /**
-     * @return the $user
+     * Get the value of userProfileEntity
+     *
+     * @return  \User\Entity\UserProfile
      */
     public function getUserProfileEntity()
     {
@@ -46,31 +42,23 @@ class ProfileEvent extends Event
     }
 
     /**
-     * @param Aqilix\ORM\Entity\EntityInterface $userProfile
+     * Set the value of userProfileEntity
+     *
+     * @param  \User\Entity\UserProfile  $userProfileEntity
+     *
+     * @return  self
      */
-    public function setUserProfileEntity(EntityInterface $userProfile)
+    public function setUserProfileEntity(\User\Entity\UserProfile $userProfileEntity)
     {
-        $this->userProfileEntity = $userProfile;
+        $this->userProfileEntity = $userProfileEntity;
+
+        return $this;
     }
 
     /**
-     * @return the $updateData
-     */
-    public function getUpdateData()
-    {
-        return $this->updateData;
-    }
-
-    /**
-     * @param object $updateData
-     */
-    public function setUpdateData($updateData)
-    {
-        $this->updateData = $updateData;
-    }
-
-    /**
-     * @return the $inputFilter
+     * Get the value of inputFilter
+     *
+     * @return  \Laminas\InputFilter\InputFilterInterface
      */
     public function getInputFilter()
     {
@@ -78,15 +66,47 @@ class ProfileEvent extends Event
     }
 
     /**
-     * @param Zend\InputFilter\InputFilterInterface $inputFilter
+     * Set the value of inputFilter
+     *
+     * @param  \Laminas\InputFilter\InputFilterInterface  $inputFilter
+     *
+     * @return  self
      */
-    public function setInputFilter(InputFilterInterface $inputFilter)
+    public function setInputFilter(\Laminas\InputFilter\InputFilterInterface $inputFilter)
     {
         $this->inputFilter = $inputFilter;
+
+        return $this;
     }
 
     /**
-     * @return the $exception
+     * Get the value of updateData
+     *
+     * @return  array
+     */
+    public function getUpdateData()
+    {
+        return $this->updateData;
+    }
+
+    /**
+     * Set the value of updateData
+     *
+     * @param  array  $updateData
+     *
+     * @return  self
+     */
+    public function setUpdateData(array $updateData)
+    {
+        $this->updateData = $updateData;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of exception
+     *
+     * @return  \Exception
      */
     public function getException()
     {
@@ -94,10 +114,16 @@ class ProfileEvent extends Event
     }
 
     /**
-     * @param Exception $exception
+     * Set the value of exception
+     *
+     * @param  \Exception  $exception
+     *
+     * @return  self
      */
-    public function setException(Exception $exception)
+    public function setException(\Exception $exception)
     {
         $this->exception = $exception;
+
+        return $this;
     }
 }

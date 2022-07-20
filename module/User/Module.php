@@ -1,73 +1,86 @@
 <?php
+
 namespace User;
 
-use ZF\Apigility\Provider\ApigilityProviderInterface;
-use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
-use Zend\ModuleManager\Feature\ConfigProviderInterface;
-use Zend\ModuleManager\Feature\ConsoleUsageProviderInterface;
-use Zend\Console\Adapter\AdapterInterface as Console;
-use Zend\Mvc\MvcEvent;
-use ZF\MvcAuth\MvcAuthEvent;
+use Laminas\ApiTools\MvcAuth\MvcAuthEvent;
+use Laminas\ApiTools\Provider\ApiToolsProviderInterface;
+use Laminas\ModuleManager\Feature\AutoloaderProviderInterface;
+use Laminas\ModuleManager\Feature\ConfigProviderInterface;
+use Laminas\Mvc\MvcEvent;
+use Laminas\Stdlib\ArrayUtils;
 
 class Module implements
-    ApigilityProviderInterface,
+    ApiToolsProviderInterface,
     AutoloaderProviderInterface,
-    ConfigProviderInterface,
-    ConsoleUsageProviderInterface
+    ConfigProviderInterface
 {
-    public function onBootstrap(MvcEvent $mvcEvent)
+    /**
+     * @param  \Laminas\Mvc\MvcEvent  $ev
+     * @return void
+     */
+    public function onBootstrap($ev)
     {
-        $serviceManager = $mvcEvent->getApplication()->getServiceManager();
-        // signup
-        $signupService  = $serviceManager->get('user.signup');
-        $signupEventListener = $serviceManager->get('user.signup.listener');
-        $signupEventListener->attach($signupService->getEventManager());
-        // user activation
-        $userActivationService = $serviceManager->get('user.activation');
-        $userActivationEventListener = $serviceManager->get('user.activation.listener');
-        $userActivationEventListener->attach($userActivationService->getEventManager());
+        $serviceManager = $ev->getApplication()->getServiceManager();
+
         // profile
-        $profileEventListener = $serviceManager->get('user.profile.listener');
-        $profileService = $serviceManager->get('user.profile');
+        $profileService = $serviceManager->get(\User\V1\Service\Profile::class);
+        $profileEventListener = $serviceManager->get(\User\V1\Service\Listener\ProfileEventListener::class);
         $profileEventListener->attach($profileService->getEventManager());
+
+        // signup
+        $signupService  = $serviceManager->get(\User\V1\Service\Signup::class);
+        $signupEventListener = $serviceManager->get(\User\V1\Service\Listener\SignupEventListener::class);
+        $signupEventListener->attach($signupService->getEventManager());
+
+        // notification email for signup
+        $signupNotificationEmailListener = $serviceManager->get(\User\V1\Notification\Email\Listener\SignupEventListener::class);
+        $signupNotificationEmailListener->attach($signupService->getEventManager());
+
+        // user activation
+        $userActivationService = $serviceManager->get(\User\V1\Service\UserActivation::class);
+        $userActivationEventListener = $serviceManager->get(\User\V1\Service\Listener\UserActivationEventListener::class);
+        $userActivationEventListener->attach($userActivationService->getEventManager());
+
+        // notification email for activation
+        $activationNotificationEmailListener = $serviceManager->get(\User\V1\Notification\Email\Listener\ActivationEventListener::class);
+        $activationNotificationEmailListener->attach($userActivationService->getEventManager());
+
         // reset password
-        $resetPasswordService = $serviceManager->get('user.resetpassword');
-        $resetPasswordEventListener = $serviceManager->get('user.resetpassword.listener');
+        $resetPasswordService = $serviceManager->get(\User\V1\Service\ResetPassword::class);
+        $resetPasswordEventListener = $serviceManager->get(\User\V1\Service\Listener\ResetPasswordEventListener::class);
         $resetPasswordEventListener->attach($resetPasswordService->getEventManager());
+
+        // notification email for reset password
+        $resetPasswordNotificationEmailListener = $serviceManager->get(\User\V1\Notification\Email\Listener\ResetPasswordEventListener::class);
+        $resetPasswordNotificationEmailListener->attach($resetPasswordService->getEventManager());
+
         // AuthActiveUserListener
-        $app    = $mvcEvent->getApplication();
-        $events = $app->getEventManager();
         $mvcAuthEvent = new MvcAuthEvent(
-            $mvcEvent,
+            $ev,
             $serviceManager->get('authentication'),
             $serviceManager->get('authorization')
         );
-        $pdoAdapter = $serviceManager->get('user.auth.pdo.adapter');
+        $app = $ev->getApplication();
+        $events = $app->getEventManager();
+        $pdoAdapter = $serviceManager->get(\User\OAuth2\Adapter\PdoAdapter::class);
         $pdoAdapter->setEventManager($events);
         $pdoAdapter->setMvcAuthEvent($mvcAuthEvent);
+
         $events->attach(
             MvcAuthEvent::EVENT_AUTHENTICATION_POST,
-            $serviceManager->get('user.auth.activeuser.listener')
+            $serviceManager->get(\User\Service\Listener\AuthActiveUserListener::class)
         );
         // add header if get http status 401
         $events->attach(
-            \Zend\Mvc\MvcEvent::EVENT_FINISH,
-            $serviceManager->get('user.auth.unauthorized.listener'),
+            MvcEvent::EVENT_FINISH,
+            $serviceManager->get(\User\Service\Listener\UnauthorizedUserListener::class),
             -100
         );
-        // notification email for signup
-        $signupNotificationEmailListener = $serviceManager->get('user.notification.email.signup.listener');
-        $signupNotificationEmailListener->attach($signupService->getEventManager());
-        // notification email for activation
-        $activationNotificationEmailListener = $serviceManager->get('user.notification.email.activation.listener');
-        $activationNotificationEmailListener->attach($userActivationService->getEventManager());
-        // notification email for reset password
-        $resetPasswordNotificationEmailListener = $serviceManager->get(
-            'user.notification.email.resetpassword.listener'
-        );
-        $resetPasswordNotificationEmailListener->attach($resetPasswordService->getEventManager());
     }
 
+    /**
+     * @return array
+     */
     public function getConfig()
     {
         $config = [];
@@ -78,35 +91,23 @@ class Module implements
 
         // merge all module config options
         foreach ($configFiles as $configFile) {
-            $config = \Zend\Stdlib\ArrayUtils::merge($config, include $configFile, true);
+            $config = ArrayUtils::merge($config, include $configFile, true);
         }
 
         return $config;
     }
 
+    /**
+     * @return array
+     */
     public function getAutoloaderConfig()
     {
         return [
-            'ZF\Apigility\Autoloader' => [
+            \Laminas\ApiTools\Autoloader::class => [
                 'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src',
                 ],
             ],
-        ];
-    }
-
-    public function getConsoleUsage(Console $console)
-    {
-        return [
-            // available command
-            'v1 user send-welcome-email <emailAddress> <activationCode>' => 'Send Welcome Email to New User',
-            'v1 user send-activation-email <emailAddress>' => 'Send Notification Account Activated to New User',
-            'v1 user send-resetpassword-email <emailAddress> <resetPaswordKey>' => 'Send Reset Password Link to Email',
-
-            // describe expected parameters
-            [ 'emailAddress',   'Email Address of New User'],
-            [ 'activationCode', 'Activation Code for New user'],
-            [ 'resetPaswordKey', 'Reset Password Key']
         ];
     }
 }

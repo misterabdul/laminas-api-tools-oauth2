@@ -2,21 +2,33 @@
 
 namespace User\Mapper;
 
-use Aqilix\ORM\Mapper\AbstractMapper;
-use Aqilix\ORM\Mapper\MapperInterface;
+use Aqilix\ORM\Mapper\Mapper;
 
 /**
  * @author Dolly Aswin <dolly.aswin@gmail.com>
  *
  * ResetPassword Mapper
  */
-class ResetPassword extends AbstractMapper implements MapperInterface
+class ResetPassword extends Mapper
 {
     /**
-     * Get Entity Repository
+     * @return \Doctrine\ORM\EntityRepository
      */
     public function getEntityRepository()
     {
-        return $this->getEntityManager()->getRepository('User\\Entity\\ResetPassword');
+        return $this->em->getRepository(\User\Entity\ResetPassword::class);
+    }
+
+    /**
+     * @param  array  $params
+     * @return \Doctrine\ORM\Query
+     */
+    public function fetchAll($params)
+    {
+        $qb = $this->getEntityRepository()->createQueryBuilder('t');
+
+        $query = $qb->getQuery();
+
+        return $query;
     }
 }

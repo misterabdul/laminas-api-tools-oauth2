@@ -3,18 +3,26 @@
 namespace User\Entity;
 
 use Aqilix\ORM\Entity\EntityInterface;
-use Aqilix\OAuth2\Entity\OauthUsers;
-use Gedmo\Timestampable\Traits\Timestampable as TimestampableTrait;
-use Gedmo\SoftDeleteable\Traits\SoftDeleteable as SoftDeleteableTrait;
+use Gedmo\Timestampable\Traits\Timestampable;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteable;
 
 /**
  * UserProfile
  */
 class UserActivation implements EntityInterface
 {
-    use TimestampableTrait;
+    use Timestampable,
+        SoftDeleteable;
 
-    use SoftDeleteableTrait;
+    /**
+     * @var \DateTime
+     */
+    private $expiration;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $activated;
 
     /**
      * @var string
@@ -22,50 +30,29 @@ class UserActivation implements EntityInterface
     private $uuid;
 
     /**
-     * @var Aqilix\OAuth2\Entity\OauthUsers
+     * @var \Aqilix\OAuth2\Entity\OauthUser
      */
     private $user;
 
-    /**
-     * @var DateTime
-     */
-    private $expiration;
-
-   /**
-     * @var DateTime
-     */
-    private $activated;
 
     /**
-     * @return the $uuid
-     */
-    public function getUuid()
-    {
-        return $this->uuid;
-    }
-
-    /**
-     * Get username
+     * Set expiration.
      *
-     * @return string
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * Set User
+     * @param \DateTime $expiration
      *
-     * @param Aqilix\OAuth2\Entity\OauthUsers $oauthUser
+     * @return UserActivation
      */
-    public function setUser(OauthUsers $oauthUser)
+    public function setExpiration($expiration)
     {
-        $this->user = $oauthUser;
+        $this->expiration = $expiration;
+
+        return $this;
     }
 
     /**
-     * @return the $expiration
+     * Get expiration.
+     *
+     * @return \DateTime
      */
     public function getExpiration()
     {
@@ -73,7 +60,23 @@ class UserActivation implements EntityInterface
     }
 
     /**
-     * @return the $activated
+     * Set activated.
+     *
+     * @param \DateTime|null $activated
+     *
+     * @return UserActivation
+     */
+    public function setActivated($activated = null)
+    {
+        $this->activated = $activated;
+
+        return $this;
+    }
+
+    /**
+     * Get activated.
+     *
+     * @return \DateTime|null
      */
     public function getActivated()
     {
@@ -81,18 +84,36 @@ class UserActivation implements EntityInterface
     }
 
     /**
-     * @param \DateTime $expiration
+     * Get uuid.
+     *
+     * @return string
      */
-    public function setExpiration($expiration)
+    public function getUuid()
     {
-        $this->expiration = $expiration;
+        return $this->uuid;
     }
 
     /**
-     * @param \DateTime $activated
+     * Set user.
+     *
+     * @param \Aqilix\OAuth2\Entity\OauthUser|null $user
+     *
+     * @return UserActivation
      */
-    public function setActivated($activated)
+    public function setUser(\Aqilix\OAuth2\Entity\OauthUser $user = null)
     {
-        $this->activated = $activated;
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user.
+     *
+     * @return \Aqilix\OAuth2\Entity\OauthUser|null
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 }

@@ -2,21 +2,16 @@
 
 namespace User\V1;
 
-use Zend\EventManager\Event;
-use Aqilix\ORM\Entity\EntityInterface;
+use Laminas\EventManager\Event;
 
 class SignupEvent extends Event
 {
-    /**#@+
-     * Signup events triggered by eventmanager
-     */
-    const EVENT_INSERT_USER = 'insert.user';
-    const EVENT_INSERT_USER_SUCCESS = 'insert.user.success';
-    const EVENT_INSERT_USER_ERROR   = 'insert.user.error';
-    /**#@-*/
+    public const EVENT_INSERT_USER = 'insert.user';
+    public const EVENT_INSERT_USER_SUCCESS = 'insert.user.success';
+    public const EVENT_INSERT_USER_ERROR   = 'insert.user.error';
 
     /**
-     * @var Aqilix\ORM\Entity\EntityInterface
+     * @var \Aqilix\OAuth2\Entity\OauthUser
      */
     protected $userEntity;
 
@@ -50,8 +45,11 @@ class SignupEvent extends Event
      */
     protected $accessTokenResponse;
 
+
     /**
-     * @return the $user
+     * Get the value of userEntity
+     *
+     * @return \Aqilix\OAuth2\Entity\OauthUser
      */
     public function getUserEntity()
     {
@@ -59,15 +57,23 @@ class SignupEvent extends Event
     }
 
     /**
-     * @param Aqilix\ORM\Entity\EntityInterface $user
+     * Set the value of userEntity
+     *
+     * @param  \Aqilix\OAuth2\Entity\OauthUser  $userEntity
+     *
+     * @return  self
      */
-    public function setUserEntity(EntityInterface $user)
+    public function setUserEntity(\Aqilix\OAuth2\Entity\OauthUser $userEntity)
     {
-        $this->userEntity = $user;
+        $this->userEntity = $userEntity;
+
+        return $this;
     }
 
     /**
-     * @return the $signupData
+     * Get the value of signupData
+     *
+     * @return  array
      */
     public function getSignupData()
     {
@@ -75,15 +81,23 @@ class SignupEvent extends Event
     }
 
     /**
-     * @param Array $signupData
+     * Set the value of signupData
+     *
+     * @param  array  $signupData
+     *
+     * @return  self
      */
     public function setSignupData(array $signupData)
     {
         $this->signupData = $signupData;
+
+        return $this;
     }
 
     /**
-     * @return the $exception
+     * Get the value of exception
+     *
+     * @return  \Exception
      */
     public function getException()
     {
@@ -91,15 +105,23 @@ class SignupEvent extends Event
     }
 
     /**
-     * @param Exception $exception
+     * Set the value of exception
+     *
+     * @param  \Exception  $exception
+     *
+     * @return  self
      */
     public function setException(\Exception $exception)
     {
         $this->exception = $exception;
+
+        return $this;
     }
 
     /**
-     * @return the $userActivationKey
+     * Get the value of userActivationKey
+     *
+     * @return  string
      */
     public function getUserActivationKey()
     {
@@ -107,15 +129,23 @@ class SignupEvent extends Event
     }
 
     /**
-     * @param string $userActivationKey
+     * Set the value of userActivationKey
+     *
+     * @param  string  $userActivationKey
+     *
+     * @return  self
      */
-    public function setUserActivationKey($userActivationKey)
+    public function setUserActivationKey(string $userActivationKey)
     {
         $this->userActivationKey = $userActivationKey;
+
+        return $this;
     }
 
     /**
-     * @return $userActivationUrl
+     * Get the value of userActivationUrl
+     *
+     * @return  string
      */
     public function getUserActivationUrl()
     {
@@ -123,15 +153,23 @@ class SignupEvent extends Event
     }
 
     /**
-     * @param string $userActivationUrl
+     * Set the value of userActivationUrl
+     *
+     * @param  string  $userActivationUrl
+     *
+     * @return  self
      */
-    public function setUserActivationUrl($userActivationUrl)
+    public function setUserActivationUrl(string $userActivationUrl)
     {
         $this->userActivationUrl = $userActivationUrl;
+
+        return $this;
     }
 
     /**
-     * @return $userActivationMessage
+     * Get the value of userActivationMessage
+     *
+     * @return  string
      */
     public function getUserActivationMessage()
     {
@@ -139,15 +177,23 @@ class SignupEvent extends Event
     }
 
     /**
-     * @param string $userActivationMessage
+     * Set the value of userActivationMessage
+     *
+     * @param  string  $userActivationMessage
+     *
+     * @return  self
      */
-    public function setUserActivationMessage($userActivationMessage)
+    public function setUserActivationMessage(string $userActivationMessage)
     {
         $this->userActivationMessage = $userActivationMessage;
+
+        return $this;
     }
 
     /**
-     * @return the $accessTokenResponse
+     * Get the value of accessTokenResponse
+     *
+     * @return  array
      */
     public function getAccessTokenResponse()
     {
@@ -155,10 +201,16 @@ class SignupEvent extends Event
     }
 
     /**
-     * @param array $accessTokenResponse
+     * Set the value of accessTokenResponse
+     *
+     * @param  array  $accessTokenResponse
+     *
+     * @return  self
      */
     public function setAccessTokenResponse(array $accessTokenResponse)
     {
         $this->accessTokenResponse = $accessTokenResponse;
+
+        return $this;
     }
 }

@@ -10,29 +10,29 @@ use Aqilix\ORM\Entity\EntityInterface;
 class OauthJwt implements EntityInterface
 {
     /**
-     * @var string
+     * @var string|null
      */
     private $subject;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $publicKey;
 
     /**
-     * @var string
+     * @var \Aqilix\OAuth2\Entity\OauthClient
      */
-    private $clientId;
+    private $client;
 
 
     /**
-     * Set subject
+     * Set subject.
      *
-     * @param string $subject
+     * @param string|null $subject
      *
      * @return OauthJwt
      */
-    public function setSubject($subject)
+    public function setSubject($subject = null)
     {
         $this->subject = $subject;
 
@@ -40,9 +40,9 @@ class OauthJwt implements EntityInterface
     }
 
     /**
-     * Get subject
+     * Get subject.
      *
-     * @return string
+     * @return string|null
      */
     public function getSubject()
     {
@@ -50,13 +50,13 @@ class OauthJwt implements EntityInterface
     }
 
     /**
-     * Set publicKey
+     * Set publicKey.
      *
-     * @param string $publicKey
+     * @param string|null $publicKey
      *
      * @return OauthJwt
      */
-    public function setPublicKey($publicKey)
+    public function setPublicKey($publicKey = null)
     {
         $this->publicKey = $publicKey;
 
@@ -64,9 +64,9 @@ class OauthJwt implements EntityInterface
     }
 
     /**
-     * Get publicKey
+     * Get publicKey.
      *
-     * @return string
+     * @return string|null
      */
     public function getPublicKey()
     {
@@ -74,12 +74,26 @@ class OauthJwt implements EntityInterface
     }
 
     /**
-     * Get clientId
+     * Set client.
      *
-     * @return string
+     * @param \Aqilix\OAuth2\Entity\OauthClient $client
+     *
+     * @return OauthJwt
      */
-    public function getClientId()
+    public function setClient(\Aqilix\OAuth2\Entity\OauthClient $client)
     {
-        return $this->clientId;
+        $this->client = $client;
+
+        return $this;
+    }
+
+    /**
+     * Get client.
+     *
+     * @return \Aqilix\OAuth2\Entity\OauthClient
+     */
+    public function getClient()
+    {
+        return $this->client;
     }
 }
