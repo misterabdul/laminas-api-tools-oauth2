@@ -1,20 +1,18 @@
 <?php
+
 namespace User\V1\Service;
 
+use Laminas\EventManager\EventManagerAwareTrait;
 use User\V1\ResetPasswordEvent;
-use Zend\EventManager\EventManagerAwareTrait;
-use User\Mapper\ResetPassword as ResetPasswordMapper;
-use Aqilix\OAuth2\Mapper\OauthUsers as UserMapper;
-use Gedmo\Exception\RuntimeException;
 
 class ResetPassword
 {
     use EventManagerAwareTrait;
 
     /**
-     * @var \User\V1\ResetPasswordEvent
+     * @var \Aqilix\OAuth2\Mapper\OauthUser
      */
-    protected $resetPasswordEvent;
+    protected $userMapper;
 
     /**
      * @var \User\Mapper\ResetPassword
@@ -22,63 +20,32 @@ class ResetPassword
     protected $resetPasswordMapper;
 
     /**
-     * @var \Aqilix\OAuth2\Mapper\OauthUsers
+     * @param  \Aqilix\Oauth2\Mapper\OauthUse  $userMapper
+     * @param  \User\Mapper\ResetPassword  $resetPasswordMapper
      */
-    protected $userMapper;
-
-    public function __construct(ResetPasswordMapper $resetPasswordMapper, UserMapper $userMapper)
-    {
-        $this->setResetPasswordMapper($resetPasswordMapper);
-        $this->setUserMapper($userMapper);
-    }
-
-    /**
-     * @return the $resetPasswordMapper
-     */
-    public function getResetPasswordMapper()
-    {
-        return $this->resetPasswordMapper;
-    }
-
-    /**
-     * @param \User\Mapper\ResetPassword $resetPasswordMapper
-     */
-    public function setResetPasswordMapper($resetPasswordMapper)
-    {
-        $this->resetPasswordMapper = $resetPasswordMapper;
-    }
-
-    /**
-     * @return the $userMapper
-     */
-    public function getUserMapper()
-    {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param \Aqilix\OAuth2\Mapper\OauthUsers $userMapper
-     */
-    public function setUserMapper(UserMapper $userMapper)
-    {
+    public function __construct(
+        $userMapper,
+        $resetPasswordMapper
+    ) {
         $this->userMapper = $userMapper;
+        $this->resetPasswordMapper = $resetPasswordMapper;
     }
 
     /**
      * Create Reset Password
      *
-     * @param  \Aqilix\OAuth2\Entity\OauthUsers $user
+     * @param  array  $confirmEmailData
      * @return \User\Entity\ResetPassword
      */
-    public function create(array $confirmEmailData)
+    public function create($confirmEmailData)
     {
         $emailAddress = $confirmEmailData['emailAddress'];
-        $user = $this->getUserMapper()->fetchOneBy(['username' => $emailAddress]);
+        $user = $this->userMapper->fetchOneBy(['username' => $emailAddress]);
         if (is_null($user)) {
             throw new \RuntimeException('Email Address not found');
         }
 
-        $event = $this->getResetPasswordEvent();
+        $event = new ResetPasswordEvent();
         $event->setName(ResetPasswordEvent::EVENT_RESET_PASSWORD_CONFIRM_EMAIL);
         $event->setUserEntity($user);
         $confirmEmail = $this->getEventManager()->triggerEvent($event);
@@ -96,9 +63,11 @@ class ResetPassword
     /**
      * Reset Password User
      *
-     * @param array $resetData
+     * @param  array  $resetData
+     * @return void
+     * @throws \RuntimeException
      */
-    public function reset(array $resetData)
+    public function reset($resetData)
     {
         $resetPasswordKey = $resetData['resetPasswordKey'];
         try {
@@ -107,7 +76,7 @@ class ResetPassword
             throw $e;
         }
 
-        $event = $this->getResetPasswordEvent();
+        $event = new ResetPasswordEvent();
         $event->setName(ResetPasswordEvent::EVENT_RESET_PASSWORD_RESET);
         $event->setUserEntity($resetPasswordEntity->getUser());
         $event->setResetPasswordEntity($resetPasswordEntity);
@@ -125,29 +94,16 @@ class ResetPassword
     }
 
     /**
-     * Get ResetPasswordEvent
-     *
-     * @return the $resetPasswordEvent
-     */
-    public function getResetPasswordEvent()
-    {
-        if ($this->resetPasswordEvent == null) {
-            $this->resetPasswordEvent = new ResetPasswordEvent();
-        }
-
-        return $this->resetPasswordEvent;
-    }
-
-    /**
      * Get Reset Password Object
      *
-     * @param  string $resetPasswordPasswordKey
-     * @return ResetPassword
-     * @throws RuntimeException
+     * @param   string  $resetPasswordKey
+     * @return \User\Entity\ResetPassword
+     * @throws \RuntimeException
      */
     public function getResetPassword($resetPasswordKey)
     {
-        $resetPassword = $this->getResetPasswordMapper()->fetchOneBy(['uuid' => $resetPasswordKey]);
+        $resetPassword = $this->resetPasswordMapper
+            ->fetchOneBy(['uuid' => $resetPasswordKey]);
         if (is_null($resetPassword)) {
             throw new \RuntimeException('Invalid Reset Password Key');
         }

@@ -1,71 +1,103 @@
 <?php
+
 namespace User\V1\Service\Listener;
 
-use Zend\EventManager\ListenerAggregateInterface;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateTrait;
+use Aqilix\OAuth2\Entity\OauthAccessToken as AccessTokenEntity;
+use Aqilix\OAuth2\Entity\OauthClient as ClientEntity;
+use Aqilix\OAuth2\Entity\OauthRefreshToken as RefreshTokenEntity;
+use Aqilix\OAuth2\Entity\OauthUser as OauthUserEntity;
 use Psr\Log\LoggerAwareTrait;
-use Aqilix\OAuth2\Mapper\OauthUsers as UserMapper;
-use User\Mapper\UserProfile as UserProfileMapper;
-use User\Mapper\UserActivation as UserActivationMapper;
-use Aqilix\OAuth2\Mapper\OauthAccessTokens as AccessTokenMapper;
-use Aqilix\OAuth2\Mapper\OauthRefreshTokens as RefreshTokenMapper;
-use Aqilix\OAuth2\ResponseType\AccessToken as OAuth2AccessToken;
+use Laminas\EventManager\ListenerAggregateInterface;
+use Laminas\EventManager\ListenerAggregateTrait;
+use User\Entity\UserActivation as UserActivationEntity;
+use User\Entity\UserProfile as UserProfileEntity;
 use User\V1\SignupEvent;
 
 class SignupEventListener implements ListenerAggregateInterface
 {
-    use ListenerAggregateTrait;
+    use ListenerAggregateTrait,
+        LoggerAwareTrait;
 
-    use LoggerAwareTrait;
-
+    /**
+     * @var array
+     */
     protected $config;
 
+    /**
+     * @var \Aqilix\OAuth2\Mapper\OauthUser
+     */
     protected $userMapper;
 
+    /**
+     * @var \User\Mapper\UserProfile  $userProfileMapper
+     */
     protected $userProfileMapper;
 
+    /**
+     * @var \User\Mapper\UserActivation  $userActivationMapper
+     */
     protected $userActivationMapper;
 
-    protected $oauth2AccessToken;
+    /**
+     * @var \Aqilix\OAuth2\Mapper\OauthClient
+     */
+    protected $clientMapper;
 
+    /**
+     * @var \Aqilix\OAuth2\Mapper\OauthAccessToken
+     */
     protected $accessTokenMapper;
 
+    /**
+     * @var \Aqilix\OAuth2\Mapper\OauthRefreshToken
+     */
     protected $refreshTokenMapper;
+
+    /**
+     * @var \Aqilix\OAuth2\ResponseType\AccessToken
+     */
+    protected $oauth2AccessToken;
 
     /**
      * Constructor
      *
-     * @param OAuth2AccessToken $oauth2AccessToken
-     * @param UserMapper $userMapper
-     * @param UserProfileMapper $userProfileMapper
-     * @param UserActivationMapper $userActivationMapper
-     * @param AccessTokenMapper $accessTokenMapper
-     * @param RefreshTokenMapper $refreshTokenMapper
+     * @param  \Aqilix\OAuth2\Mapper\OauthUser  $userMapper
+     * @param  \User\Mapper\UserProfile  $userProfileMapper
+     * @param  \User\Mapper\UserActivation  $userActivationMapper
+     * @param  \Aqilix\OAuth2\Mapper\OauthClient  $clientMapper
+     * @param  \Aqilix\OAuth2\Mapper\OauthAccessToken  $accessTokenMapper
+     * @param  \Aqilix\OAuth2\Mapper\OauthRefreshToken  $refreshTokenMapper
+     * @param  \Aqilix\OAuth2\ResponseType\AccessToken  $oauth2AccessToken
+     * @param  \Psr\Log\LoggerAwareInterface  $logger
      */
     public function __construct(
-        OAuth2AccessToken $oauth2AccessToken,
-        UserMapper $userMapper,
-        UserProfileMapper $userProfileMapper,
-        UserActivationMapper $userActivationMapper,
-        AccessTokenMapper $accessTokenMapper,
-        RefreshTokenMapper $refreshTokenMapper,
-        array $config = []
+        $config,
+        $userMapper,
+        $userProfileMapper,
+        $userActivationMapper,
+        $clientMapper,
+        $accessTokenMapper,
+        $refreshTokenMapper,
+        $oauth2AccessToken,
+        $logger
     ) {
-        $this->userMapper   = $userMapper;
-        $this->oauth2AccessToken  = $oauth2AccessToken;
-        $this->accessTokenMapper  = $accessTokenMapper;
-        $this->userProfileMapper  = $userProfileMapper;
-        $this->userActivationMapper = $userActivationMapper;
-        $this->refreshTokenMapper   = $refreshTokenMapper;
         $this->config = $config;
+        $this->userMapper = $userMapper;
+        $this->userProfileMapper = $userProfileMapper;
+        $this->userActivationMapper = $userActivationMapper;
+        $this->clientMapper = $clientMapper;
+        $this->accessTokenMapper = $accessTokenMapper;
+        $this->refreshTokenMapper = $refreshTokenMapper;
+        $this->oauth2AccessToken = $oauth2AccessToken;
+        $this->logger = $logger;
     }
 
     /**
-     * (non-PHPdoc)
-     * @see \Zend\EventManager\ListenerAggregateInterface::attach()
+     * @param  \Laminas\EventManager\EventManagerInterface  $events
+     * @param  int  $priority
+     * @return void
      */
-    public function attach(EventManagerInterface $events, $priority = 1)
+    public function attach($events, $priority = 1)
     {
         $this->listeners[] = $events->attach(
             SignupEvent::EVENT_INSERT_USER,
@@ -92,28 +124,29 @@ class SignupEventListener implements ListenerAggregateInterface
     /**
      * Create New User
      *
-     * @param  SignupEvent $event
+     * @param  \User\V1\SignupEvent  $event
      * @return void|\Exception
      */
-    public function createUser(SignupEvent $event)
+    public function createUser($event)
     {
         try {
-            $user = new \Aqilix\OAuth2\Entity\OauthUsers;
+            $user = new OauthUserEntity();
             $signupData = $event->getSignupData();
-            $password   = $this->getUserMapper()
-                               ->getPasswordHash($signupData['password']);
+            $password   = $this->userMapper
+                ->getPasswordHash($signupData['password']);
             $user->setUsername($signupData['email']);
             $user->setPassword($password);
-            $this->getUserMapper()->save($user);
+            $this->userMapper->save($user);
             $event->setUserEntity($user);
             $this->logger->log(
                 \Psr\Log\LogLevel::INFO,
                 "{function} {username}",
-                ["function" => __FUNCTION__, "username" => $signupData['email']]
+                [
+                    "function" => __FUNCTION__,
+                    "username" => $signupData['email'],
+                ]
             );
         } catch (\Exception $e) {
-            echo $e->getMessage();
-            exit;
             $event->stopPropagation(true);
             return $e;
         }
@@ -122,20 +155,23 @@ class SignupEventListener implements ListenerAggregateInterface
     /**
      * Create User Profile
      *
-     * @param  SignupEvent $event
+     * @param  \User\V1\SignupEvent  $event
      * @return void|\Exception
      */
-    public function createUserProfile(SignupEvent $event)
+    public function createUserProfile($event)
     {
         try {
             $user = $event->getUserEntity();
-            $userProfile = new \User\Entity\UserProfile;
+            $userProfile = new UserProfileEntity();
             $userProfile->setUser($user);
-            $this->getUserMapper()->save($userProfile);
+            $this->userMapper->save($userProfile);
             $this->logger->log(
                 \Psr\Log\LogLevel::INFO,
                 "{function} {username}",
-                ["function" => __FUNCTION__, "username" => $user->getUsername()]
+                [
+                    "function" => __FUNCTION__,
+                    "username" => $user->getUsername(),
+                ]
             );
         } catch (\Exception $e) {
             $event->stopPropagation(true);
@@ -146,87 +182,60 @@ class SignupEventListener implements ListenerAggregateInterface
     /**
      * Create Access Token
      *
-     * @param  SignupEvent $event
+     * @param  \User\V1\SignupEvent  $event
      * @return void|\Exception
      */
-    public function createAccessToken(SignupEvent $event)
+    public function createAccessToken($event)
     {
-        $clientId = $this->getConfig()['client_id'];
-        $userId   = $event->getUserEntity()->getUsername();
-        $now = new \DateTime('now');
-        $accessTokensExpires = new \DateTime();
-        $accessTokensExpires->setTimestamp($now->getTimestamp() + $this->getConfig()['expires_in']);
-        // @todo retrieve expired from config
-        $refreshTokenExpires = new \DateTime('now');
-        $refreshTokenExpires->add(new \DateInterval('P14D'));
-
         try {
+            $clientId = $this->config['client_id'];
+            $client = $this->clientMapper
+                ->fetchOneBy(['clientId' => $clientId]);
+            if (!($client instanceof ClientEntity))
+                throw new \Exception('Client ID not found.');
+
+            $user = $event->getUserEntity();
+            $now = new \DateTime('now');
+            $accessTokensExpires = new \DateTime();
+            $accessTokensExpires->setTimestamp(
+                $now->getTimestamp() + $this->config['expires_in']
+            );
+            // @todo retrieve expired from config
+            $refreshTokenExpires = new \DateTime('now');
+            $refreshTokenExpires->add(new \DateInterval('P14D'));
+
             // insert access_token
-            $accessTokens = new \Aqilix\OAuth2\Entity\OauthAccessTokens();
-            $accessTokens->setClientId($clientId)
-                ->setAccessToken($this->getOauth2AccessToken()->generateToken())
+            $accessTokens = new AccessTokenEntity();
+            $accessTokens->setClient($client)
+                ->setAccessToken($this->oauth2AccessToken->generateToken())
                 ->setExpires($accessTokensExpires)
-                ->setUserId($userId);
-            $this->getAccessTokenMapper()->save($accessTokens);
+                ->setUser($user);
+            $this->accessTokenMapper->save($accessTokens);
 
             // insert refresh_token
-            $refreshTokens = new \Aqilix\OAuth2\Entity\OauthRefreshTokens();
-            $refreshTokens->setClientId($clientId)
-                ->setRefreshToken($this->getOauth2AccessToken()->generateToken())
+            $refreshTokens = new RefreshTokenEntity();
+            $refreshTokens->setClient($client)
+                ->setRefreshToken($this->oauth2AccessToken->generateToken())
                 ->setExpires($refreshTokenExpires)
-                ->setUserId($userId);
-            $this->getRefreshTokenMapper()->save($refreshTokens);
-        } catch (\Exception $e) {
-            $event->stopPropagation(true);
-            return $e;
-        }
+                ->setUser($user);
+            $this->refreshTokenMapper->save($refreshTokens);
 
-        // set accessToken response
-        $accessTokensResponse = [
-            'access_token'  => $accessTokens->getAccessToken(),
-            'expires_in' => $this->getConfig()['expires_in'],
-            'token_type' => $this->getConfig()['token_type'],
-            'scope' => $this->getConfig()['scope'],
-            'refresh_token' => $refreshTokens->getRefreshToken()
-        ];
-        $event->setAccessTokenResponse($accessTokensResponse);
-        $this->logger->log(
-            \Psr\Log\LogLevel::INFO,
-            "{function} {username} {accessToken}",
-            [
-                "function" => __FUNCTION__,
-                "username" => $userId,
-                "accessToken" => $accessTokens->getAccessToken()
-            ]
-        );
-    }
-
-    /**
-     * Create Activation
-     *
-     * @param  SignupEvent $event
-     * @return void|\Exception
-     */
-    public function createActivation(SignupEvent $event)
-    {
-        try {
-            $expiration = new \DateTime();
-            // 14 day expiration
-            // @todo retrieve expired from config
-            $expiration->add(new \DateInterval('P14D'));
-            $user = $event->getUserEntity();
-            $userActivation = new \User\Entity\UserActivation;
-            $userActivation->setUser($user);
-            $userActivation->setExpiration($expiration);
-            $this->getUserActivationMapper()->save($userActivation);
-            $event->setUserActivationKey($userActivation->getUuid());
+            // set accessToken response
+            $accessTokensResponse = [
+                'access_token'  => $accessTokens->getAccessToken(),
+                'expires_in'    => $this->config['expires_in'],
+                'token_type'    => $this->config['token_type'],
+                'scope'         => $this->config['scope'],
+                'refresh_token' => $refreshTokens->getRefreshToken(),
+            ];
+            $event->setAccessTokenResponse($accessTokensResponse);
             $this->logger->log(
                 \Psr\Log\LogLevel::INFO,
-                "{function} {username} {activationUuid}",
+                "{function} {username} {accessToken}",
                 [
-                    "function" => __FUNCTION__,
-                    "username" => $user->getUsername(),
-                    "activationUuid" => $userActivation->getUuid()
+                    "function"      => __FUNCTION__,
+                    "username"      => $user->getUsername(),
+                    "accessToken"   => $accessTokens->getAccessToken(),
                 ]
             );
         } catch (\Exception $e) {
@@ -236,123 +245,36 @@ class SignupEventListener implements ListenerAggregateInterface
     }
 
     /**
-     * @return the $config
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    /**
-     * @param array $config
-     */
-    public function setConfig(array $config)
-    {
-        $this->config = $config;
-    }
-
-    /**
-     * @return the $userMapper
-     */
-    public function getUserMapper()
-    {
-        return $this->userMapper;
-    }
-
-    /**
-     * Set UserMapper
+     * Create Activation
      *
-     * @param UserMapper $userMapper
+     * @param  \User\V1\SignupEvent  $event
+     * @return void|\Exception
      */
-    public function setUserMapper(UserMapper $userMapper)
+    public function createActivation($event)
     {
-        $this->userMapper = $userMapper;
-    }
-
-    /**
-     * @return the $userProfileMapper
-     */
-    public function getUserProfileMapper()
-    {
-        return $this->userProfileMapper;
-    }
-
-    /**
-     * @param UserProfileMapper $userProfileMapper
-     */
-    public function setUserProfileMapper(UserProfileMapper $userProfileMapper)
-    {
-        $this->userProfileMapper = $userProfileMapper;
-    }
-
-    /**
-     * @return the $accessTokenMapper
-     */
-    /**
-     * @return the $userActivationMapper
-     */
-    public function getUserActivationMapper()
-    {
-        return $this->userActivationMapper;
-    }
-
-    /**
-     * @param UserActivationMapper $userActivationMapper
-     */
-    public function setUserActivationMapper(UserActivationMapper $userActivationMapper)
-    {
-        $this->userActivationMapper = $userActivationMapper;
-    }
-
-    /**
-     * Get AccessTokenMapper
-     *
-     * @return AccessTokenMapper
-     */
-    public function getAccessTokenMapper()
-    {
-        return $this->accessTokenMapper;
-    }
-
-    /**
-     * Set AccessTokenMapper
-     *
-     * @param AccessTokenMapper $accessTokenMapper
-     */
-    public function setAccessTokenMapper(AccessTokenMapper $accessTokenMapper)
-    {
-        $this->accessTokenMapper = $accessTokenMapper;
-    }
-
-    /**
-     * @return the $refreshTokenMapper
-     */
-    public function getRefreshTokenMapper()
-    {
-        return $this->refreshTokenMapper;
-    }
-
-    /**
-     * @param RefreshTokenMapper $refreshTokenMapper
-     */
-    public function setRefreshTokenMapper(RefreshTokenMapper $refreshTokenMapper)
-    {
-        $this->refreshTokenMapper = $refreshTokenMapper;
-    }
-
-    /**
-     * @return the $oauth2AccessToken
-     */
-    public function getOauth2AccessToken()
-    {
-        return $this->oauth2AccessToken;
-    }
-
-    /**
-     * @param OAuth2AccessToken $oauth2AccessToken
-     */
-    public function setOauth2AccessToken(OAuth2AccessToken $oauth2AccessToken)
-    {
-        $this->oauth2AccessToken = $oauth2AccessToken;
+        try {
+            $expiration = new \DateTime();
+            // 14 day expiration
+            // @todo retrieve expired from config
+            $expiration->add(new \DateInterval('P14D'));
+            $user = $event->getUserEntity();
+            $userActivation = new UserActivationEntity();
+            $userActivation->setUser($user);
+            $userActivation->setExpiration($expiration);
+            $this->userActivationMapper->save($userActivation);
+            $event->setUserActivationKey($userActivation->getUuid());
+            $this->logger->log(
+                \Psr\Log\LogLevel::INFO,
+                "{function} {username} {activationUuid}",
+                [
+                    "function"          => __FUNCTION__,
+                    "username"          => $user->getUsername(),
+                    "activationUuid"    => $userActivation->getUuid(),
+                ]
+            );
+        } catch (\Exception $e) {
+            $event->stopPropagation(true);
+            return $e;
+        }
     }
 }

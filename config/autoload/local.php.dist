@@ -1,15 +1,31 @@
 <?php
+
+/**
+ * Local Configuration Override
+ *
+ * This configuration override file is for overriding environment-specific and
+ * security-sensitive configuration information. Copy this file without the
+ * .dist extension at the end and populate values as needed.
+ *
+ * @NOTE: This file is ignored from Git by default with the .gitignore included
+ * in LaminasSkeletonApplication. This is a good practice, as it prevents sensitive
+ * credentials from accidentally being committed into version control.
+ */
+
+use Laminas\ApiTools\MvcAuth\Authentication\OAuth2Adapter;
+use User\OAuth2\Adapter\PdoAdapter;
+
 return [
     'db' => [
         'adapters' => [
-            'zf3_mysql' => [
-                'database' => 'zf3_apigility',
-                'driver' => 'PDO_Mysql',
-                'hostname' => 'db',
-                'username' => 'zf3',
-                'password' => 'zf3',
-                'port' => '3306',
-                'dsn' => 'mysql:dbname=zf3_apigility;host=db',
+            'mysql' => [
+                'database'  => 'laminas-api-tools',
+                'driver'    => 'PDO_Mysql',
+                'hostname'  => 'mysql',
+                'username'  => 'laminas',
+                'password'  => 'laminas',
+                'port'      => '3306',
+                'dsn'       => 'mysql:dbname=laminas-api-tools;host=mysql',
             ],
         ],
     ],
@@ -17,9 +33,9 @@ return [
         'authentication' => [
             'adapters' => [
                 'oauth2_pdo' => [
-                    'adapter' => \ZF\MvcAuth\Authentication\OAuth2Adapter::class,
+                    'adapter' => OAuth2Adapter::class,
                     'storage' => [
-                        'storage' => 'user.auth.pdo.adapter',
+                        'storage' => PdoAdapter::class,
                     ],
                 ],
             ],

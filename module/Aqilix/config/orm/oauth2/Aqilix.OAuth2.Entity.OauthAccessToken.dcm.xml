@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="Aqilix\OAuth2\Entity\OauthAccessToken" table="oauth_access_tokens">
+    <indexes>
+      <index name="oauthacctkn_client_idx" columns="client_id"/>
+      <index name="oauthacctkn_user_idx" columns="user_id"/>
+    </indexes>
+
+    <id name="accessToken" type="string" column="access_token" length="40">
+      <generator strategy="NONE"/>
+    </id>
+
+    <field name="expires" type="datetime" column="expires" nullable="false">
+      <options>
+        <option name="default">CURRENT_TIMESTAMP</option>
+      </options>
+    </field>
+    <field name="scope" type="string" column="scope" length="2000" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+
+    <many-to-one field="client" target-entity="Aqilix\OAuth2\Entity\OauthClient" fetch="EAGER">
+      <join-columns>
+        <join-column name="client_id" referenced-column-name="client_id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="user" target-entity="Aqilix\OAuth2\Entity\OauthUser" fetch="EAGER">
+      <join-columns>
+        <join-column name="user_id" referenced-column-name="username"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

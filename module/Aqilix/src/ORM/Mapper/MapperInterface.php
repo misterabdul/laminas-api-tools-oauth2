@@ -2,9 +2,6 @@
 
 namespace Aqilix\ORM\Mapper;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Aqilix\ORM\Entity\EntityInterface;
-
 /**
  * Interface of Entity
  *
@@ -12,17 +9,49 @@ use Aqilix\ORM\Entity\EntityInterface;
  */
 interface MapperInterface
 {
-    public function setEntityManager(EntityManagerInterface $em);
+    /**
+     * @param  \Doctrine\ORM\EntityManagerInterface  $em
+     * @return self
+     */
+    public function setEntityManager($em);
 
+    /**
+     * @return \Doctrine\ORM\EntityManagerInterface
+     */
     public function getEntityManager();
 
+    /**
+     * @return \Doctrine\ORM\EntityRepository
+     */
     public function getEntityRepository();
 
+    /**
+     * @param  string  $id
+     * @return object|null
+     */
     public function fetchOne($id);
 
-    public function fetchAll(array $params);
+    /**
+     * @param  array  $params
+     * @return object|null
+     */
+    public function fetchOneBy($params);
 
-    public function save(EntityInterface $entity);
+    /**
+     * @param  array  $params
+     * @return \Doctrine\ORM\Query
+     */
+    public function fetchAll($params);
 
-    public function delete(EntityInterface $entity);
+    /**
+     * @param  \Aqilix\ORM\Entity\EntityInterface  $entity
+     * @return void
+     */
+    public function save($entity);
+
+    /**
+     * @param  \Aqilix\ORM\Entity\EntityInterface  $entity
+     * @return void
+     */
+    public function delete($entity);
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
  * @copyright Copyright (c) 2016 IsItUp.com
@@ -7,28 +8,31 @@
 
 namespace User\OAuth2\Adapter;
 
-use ZF\OAuth2\Adapter\PdoAdapter as ZFOAuth2PdoAdapter;
-use ZF\MvcAuth\MvcAuthEvent;
-use Zend\Authentication\Result;
-use ZF\MvcAuth\Identity;
-use Zend\EventManager\EventManager;
+use Laminas\ApiTools\OAuth2\Adapter\PdoAdapter as LaminasPdoAdapter;
+use Laminas\ApiTools\MvcAuth\Identity\AuthenticatedIdentity;
+use Laminas\ApiTools\MvcAuth\Identity\GuestIdentity;
+use Laminas\ApiTools\MvcAuth\MvcAuthEvent;
+use Laminas\Authentication\Result;
 
 /**
  * Extension of OAuth2\Storage\PDO with EventManager
  */
-class PdoAdapter extends ZFOAuth2PdoAdapter
+class PdoAdapter extends LaminasPdoAdapter
 {
     /**
-     *
-     * @var EventManager
+     * @var \Laminas\EventManager\EventManager
      */
     protected $eventManager;
 
     /**
-     * @var MvcAuthEvent
+     * @var \Laminas\ApiTools\MvcAuth\MvcAuthEvent
      */
     protected $mvcAuthEvent;
 
+    /**
+     * @param  string  $connection
+     * @param  array  $config
+     */
     public function __construct($connection, $config)
     {
         parent::__construct($connection, $config);
@@ -37,46 +41,35 @@ class PdoAdapter extends ZFOAuth2PdoAdapter
     /**
      * Check password using bcrypt
      *
-     * @param string $user
-     * @param string $password
+     * @param  string  $user
+     * @param  string  $password
      * @return bool
      */
     protected function checkPassword($user, $password)
     {
-        $this->getMvcAuthEvent()->setAuthenticationResult(new Result(Result::SUCCESS, $user['user_id']));
-        $result = $this->getMvcAuthEvent()->getAuthenticationResult();
-        $this->getMvcAuthEvent()->setIdentity(new Identity\AuthenticatedIdentity($result->getIdentity()));
-        $this->getMvcAuthEvent()->setName(MvcAuthEvent::EVENT_AUTHENTICATION);
-        $this->getEventManager()->triggerEvent($this->getMvcAuthEvent());
+        $event = $this->mvcAuthEvent;
+        $event->setAuthenticationResult(new Result(Result::SUCCESS, $user['user_id']));
+        $event->setIdentity(new AuthenticatedIdentity($event->getAuthenticationResult()->getIdentity()));
+        $event->setName(MvcAuthEvent::EVENT_AUTHENTICATION);
+        $this->eventManager->triggerEvent($event);
+
         $verified = parent::verifyHash($password, $user['password']);
-        if (! $verified) {
-            $this->getMvcAuthEvent()->setAuthenticationResult(new Result(Result::FAILURE_CREDENTIAL_INVALID, null));
-            $this->getMvcAuthEvent()->setIdentity(new Identity\GuestIdentity());
+        if (!$verified) {
+            $event->setAuthenticationResult(new Result(Result::FAILURE_CREDENTIAL_INVALID, null));
+            $event->setIdentity(new GuestIdentity());
         }
 
-        $this->getMvcAuthEvent()->setName(MvcAuthEvent::EVENT_AUTHENTICATION_POST);
-        $this->getEventManager()->triggerEvent($this->getMvcAuthEvent());
+        $event->setName(MvcAuthEvent::EVENT_AUTHENTICATION_POST);
+        $this->eventManager->triggerEvent($event);
+
         return $verified;
     }
 
-    /**
-     * @return MvcAuthEvent
-     */
-    public function getMvcAuthEvent()
-    {
-        return $this->mvcAuthEvent;
-    }
 
     /**
-     * @param MvcAuthEvent $mvcAuthEvent
-     */
-    public function setMvcAuthEvent(MvcAuthEvent $mvcAuthEvent)
-    {
-        $this->mvcAuthEvent = $mvcAuthEvent;
-    }
-
-    /**
-     * @return the $eventManager
+     * Get the value of eventManager
+     *
+     * @return  \Laminas\EventManager\EventManager
      */
     public function getEventManager()
     {
@@ -84,10 +77,40 @@ class PdoAdapter extends ZFOAuth2PdoAdapter
     }
 
     /**
-     * @param EventManager $eventManager
+     * Set the value of eventManager
+     *
+     * @param  \Laminas\EventManager\EventManager  $eventManager
+     *
+     * @return  self
      */
-    public function setEventManager(EventManager $eventManager)
+    public function setEventManager(\Laminas\EventManager\EventManager $eventManager)
     {
         $this->eventManager = $eventManager;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of mvcAuthEvent
+     *
+     * @return  \Laminas\ApiTools\MvcAuth\MvcAuthEvent
+     */
+    public function getMvcAuthEvent()
+    {
+        return $this->mvcAuthEvent;
+    }
+
+    /**
+     * Set the value of mvcAuthEvent
+     *
+     * @param  \Laminas\ApiTools\MvcAuth\MvcAuthEvent  $mvcAuthEvent
+     *
+     * @return  self
+     */
+    public function setMvcAuthEvent(\Laminas\ApiTools\MvcAuth\MvcAuthEvent $mvcAuthEvent)
+    {
+        $this->mvcAuthEvent = $mvcAuthEvent;
+
+        return $this;
     }
 }

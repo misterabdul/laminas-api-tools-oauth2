@@ -2,14 +2,8 @@
 
 namespace User\V1\Hydrator\Strategy;
 
-use Zend\Hydrator\Strategy\StrategyInterface;
-use Aqilix\OAuth2\Entity\OauthUsers;
+use Laminas\Hydrator\Strategy\StrategyInterface;
 
-/**
- * Class UsernameStrategy
- *
- * @package User\Stdlib\Hydrator\Strategy
- */
 class PhotoStrategy implements StrategyInterface
 {
     /**
@@ -17,9 +11,12 @@ class PhotoStrategy implements StrategyInterface
      */
     protected $config;
 
-    public function __construct(array $config)
+    /**
+     * @param  array  $config
+     */
+    public function __construct($config)
     {
-        $this->setConfig($config);
+        $this->config = $config;
     }
 
     /**
@@ -35,8 +32,8 @@ class PhotoStrategy implements StrategyInterface
     public function extract($value, $object = null)
     {
         $photo = null;
-        if (! empty($value)) {
-            $photo = $this->getConfig()['base_url'] . '/' . $this->getConfig()['bucket'] . '/' . basename($value);
+        if (!empty($value)) {
+            $photo = $this->config['base_url'] . '/' . $this->config['bucket'] . '/' . basename($value);
         }
 
         return $photo;
@@ -62,21 +59,5 @@ class PhotoStrategy implements StrategyInterface
         }
 
         return $photo;
-    }
-
-    /**
-     * @return the $config
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    /**
-     * @param field_type $config
-     */
-    public function setConfig($config)
-    {
-        $this->config = $config;
     }
 }

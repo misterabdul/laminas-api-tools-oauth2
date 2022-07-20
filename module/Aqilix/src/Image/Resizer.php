@@ -1,11 +1,18 @@
 <?php
+
 namespace Aqilix\Image;
 
 class Resizer
 {
-    static protected $width  = 200;
+    /**
+     * @var int
+     */
+    protected static $width  = 200;
 
-    static protected $height = 200;
+    /**
+     * @var int
+     */
+    protected static $height = 200;
 
     /**
      * Crop-to-fit PHP-GD
@@ -24,13 +31,10 @@ class Resizer
      */
     public static function save($src, $dst, $width = null, $height = null)
     {
-        if (is_null($width)) {
+        if (is_null($width))
             $width = self::$width;
-        }
-
-        if (is_null($height)) {
+        if (is_null($height))
             $height = self::$height;
-        }
 
         /**
          * Add file validation code here
@@ -46,6 +50,8 @@ class Resizer
                 break;
             case IMAGETYPE_PNG:
                 $srcGdim = imagecreatefrompng($src);
+                break;
+            default:
                 break;
         }
 

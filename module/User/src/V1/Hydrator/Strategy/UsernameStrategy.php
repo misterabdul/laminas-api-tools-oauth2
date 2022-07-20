@@ -2,8 +2,8 @@
 
 namespace User\V1\Hydrator\Strategy;
 
-use Zend\Hydrator\Strategy\StrategyInterface;
-use Aqilix\OAuth2\Entity\OauthUsers;
+use Aqilix\OAuth2\Entity\OauthUser;
+use Laminas\Hydrator\Strategy\StrategyInterface;
 
 /**
  * Class UsernameStrategy
@@ -24,7 +24,7 @@ class UsernameStrategy implements StrategyInterface
      */
     public function extract($value, $object = null)
     {
-        if ($value instanceof OauthUsers) {
+        if ($value instanceof OauthUser) {
             return $value->getUsername();
         }
 

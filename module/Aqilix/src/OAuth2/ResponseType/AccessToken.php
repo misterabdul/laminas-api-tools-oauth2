@@ -8,10 +8,12 @@ use OAuth2\ResponseType\AccessToken as OAuth2AccessToken;
 /**
  * @author Dolly Aswin <dolly.aswin@gmail.com>
  *
- * OauthUsers Mapper
+ * AccessToken Response
  */
 class AccessToken extends OAuth2AccessToken
 {
+    /**
+     */
     public function __construct()
     {
         $tokenStorage = new Memory([
@@ -23,6 +25,9 @@ class AccessToken extends OAuth2AccessToken
         parent::__construct($tokenStorage);
     }
 
+    /**
+     * @return string
+     */
     public function generateToken()
     {
         return $this->generateAccessToken();

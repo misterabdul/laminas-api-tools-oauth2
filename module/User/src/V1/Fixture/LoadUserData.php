@@ -1,31 +1,28 @@
 <?php
+
 namespace User\V1\Fixture;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Aqilix\OAuth2\Entity\OauthUser as OauthUserEntity;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Aqilix\OAuth2\Entity\OauthUsers;
-use Zend\Crypt\Password\Bcrypt;
+use Laminas\Crypt\Password\Bcrypt;
 
 // class LoadUserData implements FixtureInterface
 class LoadUserData extends AbstractFixture implements OrderedFixtureInterface
 {
+    /**
+     * @return int
+     */
     public function getOrder()
     {
         return 0;
     }
 
-    public function setServiceLocator($sl)
-    {
-        $this->serviceLocator = $sl;
-    }
-
-    public function getServiceLocator()
-    {
-        return $this->serviceLocator;
-    }
-
-    public function load(ObjectManager $manager)
+    /**
+     * @param  \Doctrine\Persistence\ObjectManager  $manager
+     * @return void
+     */
+    public function load($manager)
     {
         $bcrypt   = new Bcrypt();
         $password = $bcrypt->create('12345678');
@@ -40,7 +37,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface
         ];
 
         foreach ($userData as $key => $data) {
-            $user[$key] = new OauthUsers();
+            $user[$key] = new OauthUserEntity();
             $user[$key]->setUsername($data['username']);
             $user[$key]->setPassword($data['password']);
             $user[$key]->setFirstName($data['firstName']);

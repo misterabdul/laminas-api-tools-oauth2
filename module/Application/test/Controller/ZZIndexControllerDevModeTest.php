@@ -1,14 +1,9 @@
 <?php
-/**
- * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
- */
 
 namespace ApplicationTest\Controller;
 
-use Application\Controller\IndexController;
-use Zend\Stdlib\ArrayUtils;
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use Laminas\Stdlib\ArrayUtils;
+use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 /**
  * Name is intentional, to force it to run last; this was necessary as,
@@ -17,24 +12,24 @@ use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
  */
 class ZZIndexControllerDevModeTest extends AbstractHttpControllerTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         // The module configuration should still be applicable for tests.
         // You can override configuration here with test case specific values,
         // such as sample view templates, path stacks, module_listener_options,
         // etc.
         $configOverrides = [
-            'modules' => [
-                'ZF\Apigility\Admin',
-                'ZF\Apigility\Admin\Ui',
+            'modules'                 => [
+                'Laminas\ApiTools\Admin',
+                'Laminas\ApiTools\Admin\Ui',
             ],
             'module_listener_options' => [
                 'config_cache_enabled' => false,
-                'config_glob_paths' => [
+                'config_glob_paths'    => [
                     __DIR__ . '/../../../../config/autoload/{,*.}{global,local}.php',
                     __DIR__ . '/../../../../config/autoload/{,*.}{global,local}-development.php',
                 ],
-            ]
+            ],
         ];
 
         $this->setApplicationConfig(ArrayUtils::merge(

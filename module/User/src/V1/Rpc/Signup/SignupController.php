@@ -1,34 +1,48 @@
 <?php
+
 namespace User\V1\Rpc\Signup;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use ZF\Hal\View\HalJsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
-use ZF\ApiProblem\ApiProblem;
-use Zend\Json\Json;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\ApiTools\Hal\View\HalJsonModel;
+use Laminas\Json\Json;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class SignupController extends AbstractActionController
 {
+    /**
+     * @var \Laminas\InputFilter\InputFilterInterface
+     */
     protected $signupValidator;
 
+    /**
+     * @var \User\V1\Service\Signup
+     */
     protected $signupService;
 
-    public function __construct($signupService, $signupValidator)
-    {
+    /**
+     * @param  \Laminas\InputFilter\InputFilterInterface  $signupValidator
+     * @param  \User\V1\Service\Signup  $signupService
+     */
+    public function __construct(
+        $signupValidator,
+        $signupService
+    ) {
         $this->signupValidator = $signupValidator;
-        $this->signupService   = $signupService;
+        $this->signupService = $signupService;
     }
 
     /**
-     * Handle /api/signup
-     *
-     * @return \ZF\ApiProblem\ApiProblemResponse|\ZF\Hal\View\HalJsonModel
+     * @return mixed
      */
     public function signupAction()
     {
-        $this->signupValidator->setData(Json::decode($this->getRequest()->getContent(), true));
         try {
-            $this->signupService->register($this->signupValidator->getValues());
+            $this->signupValidator
+                ->setData(Json::decode($this->getRequest()->getContent(), true));
+            $this->signupService
+                ->register($this->signupValidator->getValues());
+
             return new HalJsonModel($this->signupService->getSignupEvent()->getAccessTokenResponse());
         } catch (\Exception $e) {
             return new ApiProblemResponse(new ApiProblem(

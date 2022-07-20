@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="Aqilix\OAuth2\Entity\OauthAuthorizationCode" table="oauth_authorization_codes">
+    <indexes>
+      <index name="oauthathtkn_client_idx" columns="client_id"/>
+      <index name="oauthathtkn_user_idx" columns="user_id"/>
+    </indexes>
+
+    <id name="authorizationCode" type="string" column="authorization_code" length="40">
+      <generator strategy="IDENTITY"/>
+    </id>
+
+    <field name="redirectUri" type="string" column="redirect_uri" length="2000" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="expires" type="datetime" column="expires" nullable="false">
+      <options>
+        <option name="default">CURRENT_TIMESTAMP</option>
+      </options>
+    </field>
+    <field name="scope" type="string" column="scope" length="2000" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="idToken" type="string" column="id_token" length="2000" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+
+    <many-to-one field="client" target-entity="Aqilix\OAuth2\Entity\OauthClient" fetch="LAZY">
+      <join-columns>
+        <join-column name="client_id" referenced-column-name="client_id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="user" target-entity="Aqilix\OAuth2\Entity\OauthUser" fetch="LAZY">
+      <join-columns>
+        <join-column name="user_id" referenced-column-name="username"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

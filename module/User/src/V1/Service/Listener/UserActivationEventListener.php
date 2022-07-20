@@ -1,19 +1,16 @@
 <?php
+
 namespace User\V1\Service\Listener;
 
-use Zend\EventManager\ListenerAggregateInterface;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateTrait;
+use Laminas\EventManager\ListenerAggregateInterface;
+use Laminas\EventManager\ListenerAggregateTrait;
 use Psr\Log\LoggerAwareTrait;
 use User\V1\UserActivationEvent;
-use User\Mapper\UserProfile as UserProfileMapper;
-use User\Mapper\UserActivation as UserActivationMapper;
 
 class UserActivationEventListener implements ListenerAggregateInterface
 {
-    use ListenerAggregateTrait;
-
-    use LoggerAwareTrait;
+    use ListenerAggregateTrait,
+        LoggerAwareTrait;
 
     /**
      * @var \User\Mapper\UserProfile
@@ -28,20 +25,26 @@ class UserActivationEventListener implements ListenerAggregateInterface
     /**
      * Construct
      *
-     * @param \User\Mapper\UserProfile $userProfileMapper
-     * @param \User\Mapper\UserActivation $userActivationMapper
+     * @param  \User\Mapper\UserProfile  $userProfileMapper
+     * @param  \User\Mapper\UserActivation  $userActivationMapper
+     * @param  \Psr\Log\LoggerAwareInterface  $logger
      */
-    public function __construct(UserProfileMapper $userProfileMapper, UserActivationMapper $userActivationMapper)
-    {
-        $this->setUserProfileMapper($userProfileMapper);
-        $this->setUserActivationMapper($userActivationMapper);
+    public function __construct(
+        $userProfileMapper,
+        $userActivationMapper,
+        $logger
+    ) {
+        $this->userProfileMapper = $userProfileMapper;
+        $this->userActivationMapper = $userActivationMapper;
+        $this->logger = $logger;
     }
 
     /**
-     * (non-PHPdoc)
-     * @see \Zend\EventManager\ListenerAggregateInterface::attach()
+     * @param  \Laminas\EventManager\EventManagerInterface  $events
+     * @param  int  $priority
+     * @return void
      */
-    public function attach(EventManagerInterface $events, $priority = 1)
+    public function attach($events, $priority = 1)
     {
         $this->listeners[] = $events->attach(
             UserActivationEvent::EVENT_ACTIVATE_USER,
@@ -63,10 +66,10 @@ class UserActivationEventListener implements ListenerAggregateInterface
     /**
      * Check activated
      *
-     * @param  UserActivationEvent $event
-     * @return void|\Exception
+     * @param  \User\V1\UserActivationEvent  $event
+     * @return \RuntimeException|void
      */
-    public function isActivated(UserActivationEvent $event)
+    public function isActivated($event)
     {
         $userActivation = $event->getUserActivationEntity();
         if ($userActivation->getActivated() !== null) {
@@ -78,10 +81,10 @@ class UserActivationEventListener implements ListenerAggregateInterface
     /**
      * Check expiration
      *
-     * @param  UserActivationEvent $event
-     * @return void|\Exception
+     * @param  \User\V1\UserActivationEvent  $event
+     * @return \RuntimeException|void
      */
-    public function isExpired(UserActivationEvent $event)
+    public function isExpired($event)
     {
         $now = new \DateTime();
         $userActivation = $event->getUserActivationEntity();
@@ -94,10 +97,10 @@ class UserActivationEventListener implements ListenerAggregateInterface
     /**
      * Activate New User
      *
-     * @param  UserActivationEvent $event
-     * @return void|\Exception
+     * @param  \User\V1\UserActivationEvent  $event
+     * @return \Exception|void
      */
-    public function activate(UserActivationEvent $event)
+    public function activate($event)
     {
         $userActivation = $event->getUserActivationEntity();
         $userProfile = $event->getUserProfileEntity();
@@ -105,8 +108,8 @@ class UserActivationEventListener implements ListenerAggregateInterface
             $userProfile->setIsActive(true);
             $userProfile->setUserActivation($userActivation);
             $userActivation->setActivated(new \DateTime('now'));
-            $this->getUserProfileMapper()->save($userProfile);
-            $this->getUserActivationMapper()->save($userActivation);
+            $this->userProfileMapper->save($userProfile);
+            $this->userActivationMapper->save($userActivation);
             $this->logger->log(
                 \Psr\Log\LogLevel::INFO,
                 "{function} {username} {activationUuid}",
@@ -120,39 +123,5 @@ class UserActivationEventListener implements ListenerAggregateInterface
             $event->stopPropagation(true);
             return $e;
         }
-    }
-
-    /**
-     * @return the $userProfileMapper
-     */
-    public function getUserProfileMapper()
-    {
-        return $this->userProfileMapper;
-    }
-
-    /**
-     * Set UserProfile Mapper
-     *
-     * @param UserProfileMapper $userProfileMapper
-     */
-    public function setUserProfileMapper(UserProfileMapper $userProfileMapper)
-    {
-        $this->userProfileMapper = $userProfileMapper;
-    }
-
-    /**
-     * @return the $userActivationMapper
-     */
-    public function getUserActivationMapper()
-    {
-        return $this->userActivationMapper;
-    }
-
-    /**
-     * @param \User\Mapper\UserActivation $userActivationMapper
-     */
-    public function setUserActivationMapper(UserActivationMapper $userActivationMapper)
-    {
-        $this->userActivationMapper = $userActivationMapper;
     }
 }

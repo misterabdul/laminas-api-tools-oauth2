@@ -1,16 +1,19 @@
 <?php
+
+use Doctrine\DBAL\Driver\PDO\MySQL\Driver as PDOMysqlDriver;
+
 return [
     'doctrine' => [
         'connection' => [
             // default connection name
             'orm_default' => [
-                'driverClass' => 'Doctrine\DBAL\Driver\PDOMySql\Driver',
+                'driverClass' => PDOMysqlDriver::class,
                 'params' => [
-                    'host'     => 'db',
+                    'host'     => 'mysql',
                     'port'     => '3306',
-                    'user'     => 'zf3',
-                    'password' => 'zf3',
-                    'dbname'   => 'zf3_apigility',
+                    'user'     => 'laminas',
+                    'password' => 'laminas',
+                    'dbname'   => 'laminas-api-tools',
                 ],
             ],
         ],

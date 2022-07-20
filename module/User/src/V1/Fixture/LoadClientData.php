@@ -1,36 +1,33 @@
 <?php
+
 namespace User\V1\Fixture;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Aqilix\OAuth2\Entity\OauthClient as OauthClientEntity;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Aqilix\OAuth2\Entity\OauthClients;
-use Zend\Crypt\Password\Bcrypt;
+use Laminas\Crypt\Password\Bcrypt;
 
 class LoadClientData extends AbstractFixture implements OrderedFixtureInterface
 {
+    /**
+     * @return int
+     */
     public function getOrder()
     {
         return 1;
     }
 
-    public function setServiceLocator($sl)
-    {
-        $this->serviceLocator = $sl;
-    }
-
-    public function getServiceLocator()
-    {
-        return $this->serviceLocator;
-    }
-
-    public function load(ObjectManager $manager)
+    /**
+     * @param  \Doctrine\Persistence\ObjectManager  $manager
+     * @return void
+     */
+    public function load($manager)
     {
         $bcrypt = new Bcrypt();
         $clientSecret = $bcrypt->create('client1234');
         $grantTypes   = [
-          'mobile' => ['password', 'implicit', 'refresh_token'],
-          'custom' => ['client_credentials', 'implicit', 'refresh_token'],
+            'mobile' => ['password', 'implicit', 'refresh_token'],
+            'custom' => ['client_credentials', 'implicit', 'refresh_token'],
         ];
         $redirectUri  = '/oauth/receivecode';
         $clientData = [
@@ -55,7 +52,7 @@ class LoadClientData extends AbstractFixture implements OrderedFixtureInterface
         ];
 
         foreach ($clientData as $key => $data) {
-            $client[$key] = new OauthClients();
+            $client[$key] = new OauthClientEntity();
             $client[$key]->setClientSecret($data['secret']);
             $client[$key]->setClientId($data['client_id']);
             $client[$key]->setRedirectUri($redirectUri);
