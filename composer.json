@@ -16,6 +16,7 @@
         "source": "https://github.com/misterabdul/laminas-api-tools-oauth2",
         "issues": "https://github.com/misterabdul/laminas-api-tools-oauth2/issues"
     },
+    "minimum-stability": "dev",
     "config": {
         "process-timeout": 5000,
         "sort-packages": true,
@@ -65,9 +66,7 @@
         "laminas/laminas-view": "<2.10.1"
     },
     "suggest": {
-        "laminas-api-tools/api-tools-doctrine": "laminas-api-tools/api-tools-doctrine ^2.2 to create Doctrine-Connected REST services",
-        "laminas-api-tools/api-tools-http-cache": "laminas-api-tools/api-tools-http-cache ^1.4 to add HTTP caching to your API",
-        "zfr/zfr-cors": "zfr/zfr-cors ^1.5 to add CORS support to your API"
+        "laminas-api-tools/api-tools-doctrine": "laminas-api-tools/api-tools-doctrine ^2.2 to create Doctrine-Connected REST services"
     },
     "autoload": {
         "psr-4": {

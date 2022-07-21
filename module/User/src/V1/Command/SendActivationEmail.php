@@ -61,7 +61,7 @@ class SendActivationEmail extends Command
      */
     protected function configure()
     {
-        $this->setName('user:send-activation-email');
+        $this->setName('user:v1:send-activation-email');
         $this->setDescription('Send Notification Account Activated to New User');
         $this->addArgument('emailAddress', InputArgument::REQUIRED, 'Email Address of New User');
     }

@@ -36,9 +36,9 @@ return [
     ],
     'laminas-cli' => [
         'commands' => [
-            'user:send-welcome-email' => \User\V1\Command\SendWelcomeEmail::class,
-            'user:send-activation-email' => \User\V1\Command\SendActivationEmail::class,
-            'user:send-resetpassword-email' => \User\V1\Command\SendResetPasswordEmail::class,
+            'user:v1:send-welcome-email' => \User\V1\Command\SendWelcomeEmail::class,
+            'user:v1:send-activation-email' => \User\V1\Command\SendActivationEmail::class,
+            'user:v1:send-resetpassword-email' => \User\V1\Command\SendResetPasswordEmail::class,
         ],
     ],
     'controllers' => [

@@ -60,7 +60,7 @@ class SendWelcomeEmail extends Command
      */
     protected function configure()
     {
-        $this->setName('user:send-welcome-email');
+        $this->setName('user:v1:send-welcome-email');
         $this->setDescription('Send Welcome Email to New User');
         $this->addArgument('emailAddress', InputArgument::REQUIRED, 'Email Address of New User');
         $this->addArgument('activationCode', InputArgument::REQUIRED, 'Activation Code for New User');

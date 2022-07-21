@@ -60,7 +60,7 @@ class SendResetPasswordEmail extends Command
      */
     protected function configure()
     {
-        $this->setName('user:send-resetpassword-email');
+        $this->setName('user:v1:send-resetpassword-email');
         $this->setDescription('Send Reset Password Link to Email');
         $this->addArgument('emailAddress', InputArgument::REQUIRED, 'Email Address of New User');
         $this->addArgument('resetPasswordKey', InputArgument::REQUIRED, 'Reset Password Key');
