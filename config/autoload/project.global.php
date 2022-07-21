@@ -9,7 +9,7 @@ return [
         ],
         'php_process' => [
             'php_binary'    => '/usr/bin/php',
-            'script'        => __DIR__ . '/../../public/index.php',
+            'script'        => __DIR__ . '/../../vendor/bin/laminas',
         ],
     ],
 ];
