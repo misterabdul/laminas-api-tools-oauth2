@@ -8,6 +8,7 @@ return [
         "factories"  => [
             "Aqilix\Service\Mail" => \Aqilix\Service\Mail\MailgunAppFactory::class,
             \Aqilix\Service\ProcessBuilder::class => \Aqilix\Service\ProcessBuilderFactory::class,
+            \Aqilix\V1\Command\GenerateOauthClient::class => \Aqilix\V1\Command\GenerateOauthClientFactory::class,
         ],
         "abstract_factories" => [
             \Aqilix\OAuth2\Mapper\MapperFactory::class,
@@ -18,6 +19,11 @@ return [
                 Aqilix\Service\PsrLoggerDelegator::class
             ]
         ]
+    ],
+    "laminas-cli" => [
+        "commands" => [
+            "aqilix:v1:generate-oauth-client" => \Aqilix\V1\Command\GenerateOauthClient::class,
+        ],
     ],
     "log" => [
         "logger_default" => [
