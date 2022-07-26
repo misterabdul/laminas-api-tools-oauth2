@@ -1,8 +1,9 @@
-public/apigility-ui/
-public/zf-apigility/
-public/zf-apigility-documentation-swagger/
 vendor/
 
 config/development.config.php
 config/autoload/*local.php
 phpcs.xml
+phpunit.xml
+psalm.xml
+.phpcs-cache
+.phpunit.result.cache
