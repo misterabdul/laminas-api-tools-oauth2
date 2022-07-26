@@ -1,22 +1,33 @@
 <?php
+
 namespace User\V1\Rest\Profile;
 
-use ZF\ApiProblem\ApiProblem;
-use ZF\Rest\AbstractResourceListener;
-use ZF\ApiProblem\ApiProblemResponse;
-use User\Mapper\UserProfile as UserProfileMapper;
-use User\V1\Service\Profile as UserProfileService;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\Rest\AbstractResourceListener;
+use User\Entity\UserProfile as UserProfileEntity;
 
 class ProfileResource extends AbstractResourceListener
 {
+    /**
+     * @var \User\Mapper\UserProfile
+     */
     protected $userProfileMapper;
 
+    /**
+     * @var \User\V1\Service\Profile
+     */
     protected $userProfileService;
 
-    public function __construct(UserProfileMapper $userProfileMapper, UserProfileService $userProfileService)
-    {
-        $this->setUserProfileMapper($userProfileMapper);
-        $this->setUserProfileService($userProfileService);
+    /**
+     * @param  \User\Mapper\UserProfile  $userProfileMapper
+     * @param  \User\V1\Service\Profile  $userProfileService
+     */
+    public function __construct(
+        $userProfileMapper,
+        $userProfileService
+    ) {
+        $this->userProfileMapper = $userProfileMapper;
+        $this->userProfileService = $userProfileService;
     }
 
     /**
@@ -60,10 +71,10 @@ class ProfileResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
-        $userProfile = $this->getUserProfileMapper()->fetchOneBy(['uuid' => $id]);
-        if (is_null($userProfile)) {
-            return new ApiProblemResponse(new ApiProblem(404, "User Profile not found"));
-        }
+        $userProfile = $this->userProfileMapper
+            ->fetchOneBy(['uuid' => $id]);
+        if (!($userProfile instanceof UserProfileEntity))
+            return new ApiProblem(404, "User Profile not found");
 
         return $userProfile;
     }
@@ -88,7 +99,16 @@ class ProfileResource extends AbstractResourceListener
      */
     public function patch($id, $data)
     {
-        return new ApiProblem(405, 'The PATCH method has not been defined for individual resource');
+        $userProfile = $this->userProfileMapper
+            ->fetchOneBy(['uuid' => $id]);
+        if (!($userProfile instanceof UserProfileEntity))
+            return new ApiProblem(404, "User Profile not found");
+
+        $input = $this->getInputFilter();
+        $this->userProfileService
+            ->update($userProfile, $input);
+
+        return $userProfile;
     }
 
     /**
@@ -122,45 +142,6 @@ class ProfileResource extends AbstractResourceListener
      */
     public function update($id, $data)
     {
-        $userProfile = $this->getUserProfileMapper()->fetchOneBy(['uuid' => $id]);
-        if (is_null($userProfile)) {
-            return new ApiProblemResponse(new ApiProblem(404, "User Profile not found"));
-        }
-
-        $inputFilter = $this->getInputFilter();
-        $this->getUserProfileService()->update($userProfile, $inputFilter);
-        return $userProfile;
-    }
-
-    /**
-     * @return the $userProfileMapper
-     */
-    public function getUserProfileMapper()
-    {
-        return $this->userProfileMapper;
-    }
-
-    /**
-     * @param UserProfileMapper $userProfileMapper
-     */
-    public function setUserProfileMapper(UserProfileMapper $userProfileMapper)
-    {
-        $this->userProfileMapper = $userProfileMapper;
-    }
-
-    /**
-     * @return the $userProfileService
-     */
-    public function getUserProfileService()
-    {
-        return $this->userProfileService;
-    }
-
-    /**
-     * @param UserProfileService $userProfileService
-     */
-    public function setUserProfileService(UserProfileService $userProfileService)
-    {
-        $this->userProfileService = $userProfileService;
+        return $this->patch($id, $data);
     }
 }

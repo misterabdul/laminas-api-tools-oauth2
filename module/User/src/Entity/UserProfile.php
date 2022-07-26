@@ -3,18 +3,66 @@
 namespace User\Entity;
 
 use Aqilix\ORM\Entity\EntityInterface;
-use Aqilix\OAuth2\Entity\OauthUsers;
-use Gedmo\Timestampable\Traits\Timestampable as TimestampableTrait;
-use Gedmo\SoftDeleteable\Traits\SoftDeleteable as SoftDeleteableTrait;
+use Gedmo\Timestampable\Traits\Timestampable;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteable;
 
 /**
  * UserProfile
  */
 class UserProfile implements EntityInterface
 {
-    use TimestampableTrait;
+    use Timestampable,
+        SoftDeleteable;
 
-    use SoftDeleteableTrait;
+    /**
+     * @var string|null
+     */
+    private $firstName;
+
+    /**
+     * @var string|null
+     */
+    private $lastName;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $dateOfBirth;
+
+    /**
+     * @var string|null
+     */
+    private $address;
+
+    /**
+     * @var string|null
+     */
+    private $city;
+
+    /**
+     * @var string|null
+     */
+    private $province;
+
+    /**
+     * @var string|null
+     */
+    private $postalCode;
+
+    /**
+     * @var string|null
+     */
+    private $country;
+
+    /**
+     * @var string|null
+     */
+    private $photo;
+
+    /**
+     * @var bool
+     */
+    private $isActive = '0';
 
     /**
      * @var string
@@ -22,107 +70,34 @@ class UserProfile implements EntityInterface
     private $uuid;
 
     /**
-     * @var Aqilix\OAuth2\Entity\OauthUsers
+     * @var \Aqilix\OAuth2\Entity\OauthUser
      */
     private $user;
 
     /**
-     * @var string
-     */
-    private $firstName;
-
-    /**
-     * @var string
-     */
-    private $lastName;
-
-    /**
-     * @var DateTime
-     */
-    private $dateOfBirth;
-
-    /**
-     * @var string
-     */
-    private $address;
-
-    /**
-     * @var string
-     */
-    private $city;
-
-    /**
-     * @var string
-     */
-    private $province;
-
-    /**
-     * @var string
-     */
-    private $postalCode;
-
-    /**
-     * @var string
-     */
-    private $country;
-
-    /**
-     * @var string
-     */
-    private $photo;
-
-    /**
-     * @var User\Entity\UserActivation
+     * @var \User\Entity\UserActivation
      */
     private $userActivation;
 
-    /**
-     * @var boolean
-     */
-    private $isActive = false;
 
     /**
-     * @return the $uuid
-     */
-    public function getUuid()
-    {
-        return $this->uuid;
-    }
-
-    /**
-     * Get username
+     * Set firstName.
      *
-     * @return string
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * Set User
+     * @param string|null $firstName
      *
-     * @param Aqilix\OAuth2\Entity\OauthUsers $oauthUser
+     * @return UserProfile
      */
-    public function setUser(OauthUsers $oauthUser)
-    {
-        $this->user = $oauthUser;
-    }
-
-    /**
-     * Set firstName
-     *
-     * @param string $firstName
-     */
-    public function setFirstName($firstName)
+    public function setFirstName($firstName = null)
     {
         $this->firstName = $firstName;
+
+        return $this;
     }
 
     /**
-     * Get firstName
+     * Get firstName.
      *
-     * @return string
+     * @return string|null
      */
     public function getFirstName()
     {
@@ -130,19 +105,23 @@ class UserProfile implements EntityInterface
     }
 
     /**
-     * Set lastName
+     * Set lastName.
      *
-     * @param string $lastName
+     * @param string|null $lastName
+     *
+     * @return UserProfile
      */
-    public function setLastName($lastName)
+    public function setLastName($lastName = null)
     {
         $this->lastName = $lastName;
+
+        return $this;
     }
 
     /**
-     * Get lastName
+     * Get lastName.
      *
-     * @return string
+     * @return string|null
      */
     public function getLastName()
     {
@@ -150,7 +129,23 @@ class UserProfile implements EntityInterface
     }
 
     /**
-     * @return the $dateOfBirth
+     * Set dateOfBirth.
+     *
+     * @param \DateTime|null $dateOfBirth
+     *
+     * @return UserProfile
+     */
+    public function setDateOfBirth($dateOfBirth = null)
+    {
+        $this->dateOfBirth = $dateOfBirth;
+
+        return $this;
+    }
+
+    /**
+     * Get dateOfBirth.
+     *
+     * @return \DateTime|null
      */
     public function getDateOfBirth()
     {
@@ -158,15 +153,23 @@ class UserProfile implements EntityInterface
     }
 
     /**
-     * @param \DateTime $dateOfBirth
+     * Set address.
+     *
+     * @param string|null $address
+     *
+     * @return UserProfile
      */
-    public function setDateOfBirth($dateOfBirth)
+    public function setAddress($address = null)
     {
-        $this->dateOfBirth = $dateOfBirth;
+        $this->address = $address;
+
+        return $this;
     }
 
     /**
-     * @return the $address
+     * Get address.
+     *
+     * @return string|null
      */
     public function getAddress()
     {
@@ -174,15 +177,23 @@ class UserProfile implements EntityInterface
     }
 
     /**
-     * @param string $address
+     * Set city.
+     *
+     * @param string|null $city
+     *
+     * @return UserProfile
      */
-    public function setAddress($address)
+    public function setCity($city = null)
     {
-        $this->address = $address;
+        $this->city = $city;
+
+        return $this;
     }
 
     /**
-     * @return the $city
+     * Get city.
+     *
+     * @return string|null
      */
     public function getCity()
     {
@@ -190,15 +201,23 @@ class UserProfile implements EntityInterface
     }
 
     /**
-     * @param string $city
+     * Set province.
+     *
+     * @param string|null $province
+     *
+     * @return UserProfile
      */
-    public function setCity($city)
+    public function setProvince($province = null)
     {
-        $this->city = $city;
+        $this->province = $province;
+
+        return $this;
     }
 
     /**
-     * @return the $province
+     * Get province.
+     *
+     * @return string|null
      */
     public function getProvince()
     {
@@ -206,15 +225,23 @@ class UserProfile implements EntityInterface
     }
 
     /**
-     * @param string $province
+     * Set postalCode.
+     *
+     * @param string|null $postalCode
+     *
+     * @return UserProfile
      */
-    public function setProvince($province)
+    public function setPostalCode($postalCode = null)
     {
-        $this->province = $province;
+        $this->postalCode = $postalCode;
+
+        return $this;
     }
 
     /**
-     * @return the $postalCode
+     * Get postalCode.
+     *
+     * @return string|null
      */
     public function getPostalCode()
     {
@@ -222,15 +249,23 @@ class UserProfile implements EntityInterface
     }
 
     /**
-     * @param string $postalCode
+     * Set country.
+     *
+     * @param string|null $country
+     *
+     * @return UserProfile
      */
-    public function setPostalCode($postalCode)
+    public function setCountry($country = null)
     {
-        $this->postalCode = $postalCode;
+        $this->country = $country;
+
+        return $this;
     }
 
     /**
-     * @return the $country
+     * Get country.
+     *
+     * @return string|null
      */
     public function getCountry()
     {
@@ -238,15 +273,23 @@ class UserProfile implements EntityInterface
     }
 
     /**
-     * @param string $country
+     * Set photo.
+     *
+     * @param string|null $photo
+     *
+     * @return UserProfile
      */
-    public function setCountry($country)
+    public function setPhoto($photo = null)
     {
-        $this->country = $country;
+        $this->photo = $photo;
+
+        return $this;
     }
 
     /**
-     * @return the $photo
+     * Get photo.
+     *
+     * @return string|null
      */
     public function getPhoto()
     {
@@ -254,42 +297,84 @@ class UserProfile implements EntityInterface
     }
 
     /**
-     * @param string $photo
+     * Set isActive.
+     *
+     * @param bool $isActive
+     *
+     * @return UserProfile
      */
-    public function setPhoto($photo)
+    public function setIsActive($isActive)
     {
-        $this->photo = $photo;
+        $this->isActive = $isActive;
+
+        return $this;
     }
 
     /**
-     * @return the $userActivation
+     * Get isActive.
+     *
+     * @return bool
      */
-    public function getUserActivation()
-    {
-        return $this->userActivation;
-    }
-
-    /**
-     * @param \User\Entity\UserActivation $userActivation
-     */
-    public function setUserActivation($userActivation)
-    {
-        $this->userActivation = $userActivation;
-    }
-
-    /**
-     * @return the $isActive
-     */
-    public function isActive()
+    public function getIsActive()
     {
         return $this->isActive;
     }
 
     /**
-     * @param boolean $isActive
+     * Get uuid.
+     *
+     * @return string
      */
-    public function setIsActive($isActive)
+    public function getUuid()
     {
-        $this->isActive = $isActive;
+        return $this->uuid;
+    }
+
+    /**
+     * Set user.
+     *
+     * @param \Aqilix\OAuth2\Entity\OauthUser|null $user
+     *
+     * @return UserProfile
+     */
+    public function setUser(\Aqilix\OAuth2\Entity\OauthUser $user = null)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user.
+     *
+     * @return \Aqilix\OAuth2\Entity\OauthUser|null
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * Set userActivation.
+     *
+     * @param \User\Entity\UserActivation|null $userActivation
+     *
+     * @return UserProfile
+     */
+    public function setUserActivation(\User\Entity\UserActivation $userActivation = null)
+    {
+        $this->userActivation = $userActivation;
+
+        return $this;
+    }
+
+    /**
+     * Get userActivation.
+     *
+     * @return \User\Entity\UserActivation|null
+     */
+    public function getUserActivation()
+    {
+        return $this->userActivation;
     }
 }

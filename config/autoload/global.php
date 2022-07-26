@@ -1,14 +1,14 @@
 <?php
 return [
-    'zf-content-negotiation' => [
+    'api-tools-content-negotiation' => [
         'selectors' => [],
     ],
     'db' => [
         'adapters' => [
-            'zf3_mysql' => [],
+            'dummy' => [],
         ],
     ],
-    'zf-mvc-auth' => [
+    'laminas-mvc-auth' => [
         'authentication' => [
             'adapters' => [
                 'oauth2_pdo' => [
@@ -29,6 +29,13 @@ return [
                     'regex' => '(?P<oauth>(/oauth))',
                 ],
                 'type' => 'regex',
+            ],
+        ],
+    ],
+    'api-tools-mvc-auth' => [
+        'authentication' => [
+            'map' => [
+                'User\\V1' => 'oauth2_pdo',
             ],
         ],
     ],

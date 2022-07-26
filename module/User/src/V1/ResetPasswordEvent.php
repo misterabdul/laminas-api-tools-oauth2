@@ -2,22 +2,16 @@
 
 namespace User\V1;
 
-use Zend\EventManager\Event;
-use User\Entity\ResetPassword;
-use Aqilix\OAuth2\Entity\OauthUsers as User;
+use Laminas\EventManager\Event;
 
 class ResetPasswordEvent extends Event
 {
-    /**#@+
-     * Signup events triggered by eventmanager
-     */
-    const EVENT_RESET_PASSWORD_CONFIRM_EMAIL = 'reset.password.confirm.email';
-    const EVENT_RESET_PASSWORD_CONFIRM_EMAIL_SUCCESS = 'reset.password.confirm.email.success';
-    const EVENT_RESET_PASSWORD_CONFIRM_EMAIL_ERROR   = 'reset.password.confirm.email.error';
-    const EVENT_RESET_PASSWORD_RESET = 'reset.password.reset';
-    const EVENT_RESET_PASSWORD_RESET_SUCCESS = 'reset.password.reset.success';
-    const EVENT_RESET_PASSWORD_RESET_ERROR   = 'reset.password.reset.error';
-    /**#@-*/
+    public const EVENT_RESET_PASSWORD_CONFIRM_EMAIL = 'reset.password.confirm.email';
+    public const EVENT_RESET_PASSWORD_CONFIRM_EMAIL_SUCCESS = 'reset.password.confirm.email.success';
+    public const EVENT_RESET_PASSWORD_CONFIRM_EMAIL_ERROR   = 'reset.password.confirm.email.error';
+    public const EVENT_RESET_PASSWORD_RESET = 'reset.password.reset';
+    public const EVENT_RESET_PASSWORD_RESET_SUCCESS = 'reset.password.reset.success';
+    public const EVENT_RESET_PASSWORD_RESET_ERROR   = 'reset.password.reset.error';
 
     /**
      * @var \User\Entity\ResetPassword
@@ -25,7 +19,7 @@ class ResetPasswordEvent extends Event
     protected $resetPasswordEntity;
 
     /**
-     * @var \Aqilix\OAuth2\Entity\OauthUsers
+     * @var \Aqilix\OAuth2\Entity\OauthUser
      */
     protected $userEntity;
 
@@ -44,32 +38,11 @@ class ResetPasswordEvent extends Event
      */
     protected $exception;
 
-    /**
-     * @return the $resetPasswordData
-     */
-    public function getResetPasswordData()
-    {
-        return $this->resetPasswordData;
-    }
 
     /**
-     * @param array $resetPasswordData
-     */
-    public function setResetPasswordData($resetPasswordData)
-    {
-        $this->resetPasswordData = $resetPasswordData;
-    }
-
-    /**
-     * @param Exception $exception
-     */
-    public function setException(\Exception $exception)
-    {
-        $this->exception = $exception;
-    }
-
-    /**
-     * @return the $resetPasswordEntity
+     * Get the value of resetPasswordEntity
+     *
+     * @return  \User\Entity\ResetPassword
      */
     public function getResetPasswordEntity()
     {
@@ -77,31 +50,23 @@ class ResetPasswordEvent extends Event
     }
 
     /**
-     * @param \User\Entity\ResetPassword $resetPasswordEntity
+     * Set the value of resetPasswordEntity
+     *
+     * @param  \User\Entity\ResetPassword  $resetPasswordEntity
+     *
+     * @return  self
      */
-    public function setResetPasswordEntity(ResetPassword $resetPasswordEntity)
+    public function setResetPasswordEntity(\User\Entity\ResetPassword $resetPasswordEntity)
     {
         $this->resetPasswordEntity = $resetPasswordEntity;
+
+        return $this;
     }
 
     /**
-     * @return the $resetPasswordKey
-     */
-    public function getResetPasswordKey()
-    {
-        return $this->resetPasswordKey;
-    }
-
-    /**
-     * @param string $resetPasswordKey
-     */
-    public function setResetPasswordKey($resetPasswordKey)
-    {
-        $this->resetPasswordKey = $resetPasswordKey;
-    }
-
-    /**
-     * @return the $userEntity
+     * Get the value of userEntity
+     *
+     * @return  \Aqilix\OAuth2\Entity\OauthUser
      */
     public function getUserEntity()
     {
@@ -109,18 +74,88 @@ class ResetPasswordEvent extends Event
     }
 
     /**
-     * @param \Aqilix\OAuth2\Entity\OauthUsers $userEntity
+     * Set the value of userEntity
+     *
+     * @param  \Aqilix\OAuth2\Entity\OauthUser  $userEntity
+     *
+     * @return  self
      */
-    public function setUserEntity(User $userEntity)
+    public function setUserEntity(\Aqilix\OAuth2\Entity\OauthUser $userEntity)
     {
         $this->userEntity = $userEntity;
+
+        return $this;
     }
 
     /**
-     * @return the $exception
+     * Get the value of resetPasswordKey
+     *
+     * @return  string
+     */
+    public function getResetPasswordKey()
+    {
+        return $this->resetPasswordKey;
+    }
+
+    /**
+     * Set the value of resetPasswordKey
+     *
+     * @param  string  $resetPasswordKey
+     *
+     * @return  self
+     */
+    public function setResetPasswordKey(string $resetPasswordKey)
+    {
+        $this->resetPasswordKey = $resetPasswordKey;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of resetPasswordData
+     *
+     * @return  array
+     */
+    public function getResetPasswordData()
+    {
+        return $this->resetPasswordData;
+    }
+
+    /**
+     * Set the value of resetPasswordData
+     *
+     * @param  array  $resetPasswordData
+     *
+     * @return  self
+     */
+    public function setResetPasswordData(array $resetPasswordData)
+    {
+        $this->resetPasswordData = $resetPasswordData;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of exception
+     *
+     * @return  \Exception
      */
     public function getException()
     {
         return $this->exception;
+    }
+
+    /**
+     * Set the value of exception
+     *
+     * @param  \Exception  $exception
+     *
+     * @return  self
+     */
+    public function setException(\Exception $exception)
+    {
+        $this->exception = $exception;
+
+        return $this;
     }
 }

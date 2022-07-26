@@ -2,19 +2,13 @@
 
 namespace User\V1;
 
-use Zend\EventManager\Event;
-use User\Entity\UserProfile;
-use User\Entity\UserActivation;
+use Laminas\EventManager\Event;
 
 class UserActivationEvent extends Event
 {
-    /**#@+
-     * Signup events triggered by eventmanager
-     */
-    const EVENT_ACTIVATE_USER = 'activate.user';
-    const EVENT_ACTIVATE_USER_SUCCESS = 'activate.user.success';
-    const EVENT_ACTIVATE_USER_ERROR   = 'activate.user.error';
-    /**#@-*/
+    public const EVENT_ACTIVATE_USER = 'activate.user';
+    public const EVENT_ACTIVATE_USER_SUCCESS = 'activate.user.success';
+    public const EVENT_ACTIVATE_USER_ERROR   = 'activate.user.error';
 
     /**
      * @var \User\Entity\UserProfile
@@ -41,8 +35,11 @@ class UserActivationEvent extends Event
      */
     protected $exception;
 
+
     /**
-     * @return the $userProfileEntity
+     * Get the value of userProfileEntity
+     *
+     * @return  \User\Entity\UserProfile
      */
     public function getUserProfileEntity()
     {
@@ -50,15 +47,23 @@ class UserActivationEvent extends Event
     }
 
     /**
-     * @param \User\Entity\UserProfile $userProfileEntity
+     * Set the value of userProfileEntity
+     *
+     * @param  \User\Entity\UserProfile  $userProfileEntity
+     *
+     * @return  self
      */
-    public function setUserProfileEntity(UserProfile $userProfileEntity)
+    public function setUserProfileEntity(\User\Entity\UserProfile $userProfileEntity)
     {
         $this->userProfileEntity = $userProfileEntity;
+
+        return $this;
     }
 
     /**
-     * @return the $userActivationEntity
+     * Get the value of userActivationEntity
+     *
+     * @return  \User\Entity\UserActivation
      */
     public function getUserActivationEntity()
     {
@@ -66,31 +71,23 @@ class UserActivationEvent extends Event
     }
 
     /**
-     * @param \User\Entity\UserActivation $userActivationEntity
+     * Set the value of userActivationEntity
+     *
+     * @param  \User\Entity\UserActivation  $userActivationEntity
+     *
+     * @return  self
      */
-    public function setUserActivationEntity(UserActivation $userActivationEntity)
+    public function setUserActivationEntity(\User\Entity\UserActivation $userActivationEntity)
     {
         $this->userActivationEntity = $userActivationEntity;
+
+        return $this;
     }
 
     /**
-     * @return the $userActivationUuid
-     */
-    public function getUserActivationUuid()
-    {
-        return $this->userActivationUuid;
-    }
-
-    /**
-     * @param string $userActivationUuid
-     */
-    public function setUserActivationUuid($userActivationUuid)
-    {
-        $this->userActivationUuid = $userActivationUuid;
-    }
-
-    /**
-     * @return the $userActivationData
+     * Get the value of userActivationData
+     *
+     * @return  array
      */
     public function getUserActivationData()
     {
@@ -98,15 +95,47 @@ class UserActivationEvent extends Event
     }
 
     /**
-     * @param array $userActivationData
+     * Set the value of userActivationData
+     *
+     * @param  array  $userActivationData
+     *
+     * @return  self
      */
     public function setUserActivationData(array $userActivationData)
     {
         $this->userActivationData = $userActivationData;
+
+        return $this;
     }
 
     /**
-     * @return the $exception
+     * Get the value of userActivationUuid
+     *
+     * @return  string
+     */
+    public function getUserActivationUuid()
+    {
+        return $this->userActivationUuid;
+    }
+
+    /**
+     * Set the value of userActivationUuid
+     *
+     * @param  string  $userActivationUuid
+     *
+     * @return  self
+     */
+    public function setUserActivationUuid(string $userActivationUuid)
+    {
+        $this->userActivationUuid = $userActivationUuid;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of exception
+     *
+     * @return  \Exception
      */
     public function getException()
     {
@@ -114,10 +143,16 @@ class UserActivationEvent extends Event
     }
 
     /**
-     * @param Exception $exception
+     * Set the value of exception
+     *
+     * @param  \Exception  $exception
+     *
+     * @return  self
      */
     public function setException(\Exception $exception)
     {
         $this->exception = $exception;
+
+        return $this;
     }
 }

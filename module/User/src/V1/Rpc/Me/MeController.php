@@ -1,27 +1,43 @@
 <?php
+
 namespace User\V1\Rpc\Me;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use ZF\Hal\View\HalJsonModel;
-use ZF\ApiProblem\ApiProblemResponse;
-use ZF\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\ApiTools\Hal\View\HalJsonModel;
+use User\Controller\AuthenticatedAction;
 
-class MeController extends AbstractActionController
+class MeController extends AuthenticatedAction
 {
-    private $userProfile;
+    /**
+     * @var \Doctrine\Laminas\Hydrator\DoctrineObject
+     */
+    protected $userProfileHydrator;
 
-    public function __construct($userProfile)
-    {
-        $this->userProfile = $userProfile;
+    /**
+     * @param  \User\Mapper\UserProfile  $userProfileMapper
+     * @param  \Doctrine\Laminas\Hydrator\DoctrineObject  $userProfileHydrator
+     */
+    public function __construct(
+        $userProfileMapper,
+        $userProfileHydrator
+    ) {
+        parent::__construct($userProfileMapper);
+        $this->userProfileHydrator = $userProfileHydrator;
     }
 
+    /**
+     * @return mixed
+     */
     public function meAction()
     {
-        $userProfile = [];
-        if (! is_null($this->userProfile)) {
-            return new HalJsonModel(['uuid'  => $this->userProfile->getUuid()]);
-        } else {
-            return new ApiProblemResponse(new ApiProblem(404, "User Identity not found"));
-        }
+        $me = $this->fetchUserProfile();
+        if ($me === null)
+            return new ApiProblemResponse(new ApiProblem(401, "Unauthenticated"));
+
+        $extracted = $this->userProfileHydrator
+            ->extract($me);
+
+        return new HalJsonModel($extracted);
     }
 }

@@ -1,10 +1,10 @@
 <?php
+
 namespace Aqilix\Service\Mail;
 
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Interop\Container\ContainerInterface;
-use Zend\Mail\Transport\Smtp as SmtpTransport;
-use Zend\Mail\Transport\SmtpOptions;
+use Laminas\Mail\Transport\Smtp as SmtpTransport;
+use Laminas\Mail\Transport\SmtpOptions;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
  * Mailgun SMTP Transport Object
@@ -14,12 +14,15 @@ use Zend\Mail\Transport\SmtpOptions;
 class MailgunAppFactory implements FactoryInterface
 {
     /**
-     * Create service for MailgunApp
-     *
-     * (non-PHPdoc)
-     * @see \Zend\ServiceManager\Factory\FactoryInterface::__invoke()
+     * @param  \Psr\Container\ContainerInterface  $container
+     * @param  string  $requestedName
+     * @param  array|null  $options
+     * @return object
+     * @throws \Laminas\ServiceManager\Exception\ServiceNotFoundException If unable to resolve the service.
+     * @throws \Laminas\ServiceManager\Exception\ServiceNotCreatedException If an exception is raised when creating a service.
+     * @throws \Psr\Container\ContainerExceptionInterface If any other error occurs.
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke($container, $requestedName, $options = null)
     {
         $config  = $container->get('Config')['mail']['transport']['mailgunapp'];
         $transport = new SmtpTransport();

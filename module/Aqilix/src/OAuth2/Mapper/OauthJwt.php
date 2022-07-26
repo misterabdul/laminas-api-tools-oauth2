@@ -2,21 +2,33 @@
 
 namespace Aqilix\OAuth2\Mapper;
 
-use Aqilix\ORM\Mapper\AbstractMapper;
-use Aqilix\ORM\Mapper\MapperInterface;
+use Aqilix\ORM\Mapper\Mapper;
 
 /**
  * @author Dolly Aswin <dolly.aswin@gmail.com>
  *
  * OauthJwt Mapper
  */
-class OauthJwt extends AbstractMapper implements MapperInterface
+class OauthJwt extends Mapper
 {
     /**
-     * Get Entity Repository
+     * @return \Doctrine\ORM\EntityRepository
      */
     public function getEntityRepository()
     {
-        return $this->getEntityManager()->getRepository('Aqilix\OAuth2\Entity\OauthUsers');
+        return $this->em->getRepository(\Aqilix\OAuth2\Entity\OauthJwt::class);
+    }
+
+    /**
+     * @param  array  $params
+     * @return \Doctrine\ORM\Query
+     */
+    public function fetchAll($params)
+    {
+        $qb = $this->getEntityRepository()->createQueryBuilder('t');
+
+        $query = $qb->getQuery();
+
+        return $query;
     }
 }

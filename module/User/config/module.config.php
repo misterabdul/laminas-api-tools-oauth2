@@ -1,44 +1,55 @@
 <?php
 return [
-    'controllers' => [
-        'factories' => [
-            'User\\V1\\Rpc\\Signup\\Controller' => \User\V1\Rpc\Signup\SignupControllerFactory::class,
-            'User\\V1\\Rpc\\Me\\Controller' => \User\V1\Rpc\Me\MeControllerFactory::class,
-            'User\\V1\\Rpc\\UserActivation\\Controller' => \User\V1\Rpc\UserActivation\UserActivationControllerFactory::class,
-            \User\V1\Console\Controller\EmailController::class => \User\V1\Console\Controller\EmailControllerFactory::class,
-            'User\\V1\\Rpc\\ResetPasswordConfirmEmail\\Controller' => \User\V1\Rpc\ResetPasswordConfirmEmail\ResetPasswordConfirmEmailControllerFactory::class,
-            'User\\V1\\Rpc\\ResetPasswordNewPassword\\Controller' => \User\V1\Rpc\ResetPasswordNewPassword\ResetPasswordNewPasswordControllerFactory::class,
-        ],
-    ],
     'service_manager' => [
         'factories' => [
-            'user.resetpassword' => \User\V1\Service\ResetPasswordFactory::class,
-            'user.activation' => \User\V1\Service\UserActivationFactory::class,
-            'user.signup'  => \User\V1\Service\SignupFactory::class,
-            'user.profile' => \User\V1\Service\ProfileFactory::class,
-            'user.activation.listener'    => \User\V1\Service\Listener\UserActivationEventListenerFactory::class,
-            'user.resetpassword.listener' => \User\V1\Service\Listener\ResetPasswordEventListenerFactory::class,
-            'user.signup.listener'  => \User\V1\Service\Listener\SignupEventListenerFactory::class,
-            'user.profile.listener' => \User\V1\Service\Listener\ProfileEventListenerFactory::class,
-            'user.notification.email.signup.listener' => \User\V1\Notification\Email\Listener\SignupEventListenerFactory::class,
-            'user.notification.email.activation.listener'    => \User\V1\Notification\Email\Listener\ActivationEventListenerFactory::class,
-            'user.notification.email.resetpassword.listener' => \User\V1\Notification\Email\Listener\ResetPasswordEventListenerFactory::class,
-            'user.notification.email.service.resetpassword'  => \User\V1\Notification\Email\Service\ResetPasswordFactory::class,
-            'user.notification.email.service.welcome'     => \User\V1\Notification\Email\Service\WelcomeFactory::class,
-            'user.notification.email.service.activation'  => \User\V1\Notification\Email\Service\ActivationFactory::class,
-            'user.auth.pdo.adapter' => \User\OAuth2\Factory\PdoAdapterFactory::class,
-            'user.auth.activeuser.listener' => \User\Service\Listener\AuthActiveUserListenerFactory::class,
-            'user.hydrator.photo.strategy'  => \User\V1\Hydrator\Strategy\PhotoStrategyFactory::class,
-            'user.auth.unauthorized.listener' => \User\Service\Listener\UnauthorizedUserListenerFactory::class,
-            \User\V1\Rest\Profile\ProfileResource::class => \User\V1\Rest\Profile\ProfileResourceFactory::class
+            \User\V1\Rest\Profile\ProfileResource::class => \User\V1\Rest\Profile\ProfileResourceFactory::class,
+            \User\V1\Service\Profile::class => \User\V1\Service\ProfileFactory::class,
+            \User\V1\Service\Listener\ProfileEventListener::class => \User\V1\Service\Listener\ProfileEventListenerFactory::class,
+            \User\V1\Service\Signup::class => \User\V1\Service\SignupFactory::class,
+            \User\V1\Service\Listener\SignupEventListener::class => \User\V1\Service\Listener\SignupEventListenerFactory::class,
+            'User\\V1\\Notification\\Email\\Service\\Welcome' => \User\V1\Notification\Email\Service\WelcomeFactory::class,
+            \User\V1\Notification\Email\Listener\SignupEventListener::class => \User\V1\Notification\Email\Listener\SignupEventListenerFactory::class,
+            \User\V1\Command\SendWelcomeEmail::class => \User\V1\Command\SendWelcomeEmailFactory::class,
+            \User\V1\Service\UserActivation::class => \User\V1\Service\UserActivationFactory::class,
+            \User\V1\Service\Listener\UserActivationEventListener::class => \User\V1\Service\Listener\UserActivationEventListenerFactory::class,
+            'User\\V1\\Notification\\Email\\Service\\Activation' => \User\V1\Notification\Email\Service\ActivationFactory::class,
+            \User\V1\Notification\Email\Listener\ActivationEventListener::class => \User\V1\Notification\Email\Listener\ActivationEventListenerFactory::class,
+            \User\V1\Command\SendActivationEmail::class => \User\V1\Command\SendActivationEmailFactory::class,
+            \User\V1\Service\ResetPassword::class => \User\V1\Service\ResetPasswordFactory::class,
+            \User\V1\Service\Listener\ResetPasswordEventListener::class => \User\V1\Service\Listener\ResetPasswordEventListenerFactory::class,
+            'User\\V1\\Notification\\Email\\Service\\ResetPassword' => \User\V1\Notification\Email\Service\ResetPasswordFactory::class,
+            \User\V1\Notification\Email\Listener\ResetPasswordEventListener::class => \User\V1\Notification\Email\Listener\ResetPasswordEventListenerFactory::class,
+            \User\V1\Command\SendResetPasswordEmail::class => \User\V1\Command\SendResetPasswordEmailFactory::class,
+            \User\OAuth2\Adapter\PdoAdapter::class => \User\OAuth2\Factory\PdoAdapterFactory::class,
+            \User\Service\Listener\AuthActiveUserListener::class => \User\Service\Listener\AuthActiveUserListenerFactory::class,
+            \User\Service\Listener\UnauthorizedUserListener::class => \User\Service\Listener\UnauthorizedUserListenerFactory::class,
+            \User\V1\Hydrator\Strategy\PhotoStrategy::class => \User\V1\Hydrator\Strategy\PhotoStrategyFactory::class,
+            \User\V1\Command\GenerateAdminUser::class => \User\V1\Command\GenerateAdminUserFactory::class,
         ],
         'abstract_factories' => [
-            0 => \User\Mapper\AbstractMapperFactory::class,
+            0 => \User\Mapper\MapperFactory::class,
         ],
     ],
     'hydrators' => [
         'factories' => [
             'User\\Hydrator\\UserProfile' => \User\V1\Hydrator\UserProfileHydratorFactory::class,
+        ],
+    ],
+    'laminas-cli' => [
+        'commands' => [
+            'user:v1:send-welcome-email' => \User\V1\Command\SendWelcomeEmail::class,
+            'user:v1:send-activation-email' => \User\V1\Command\SendActivationEmail::class,
+            'user:v1:send-resetpassword-email' => \User\V1\Command\SendResetPasswordEmail::class,
+            'user:v1:generate-admin-user' => \User\V1\Command\GenerateAdminUser::class,
+        ],
+    ],
+    'controllers' => [
+        'factories' => [
+            'User\\V1\\Rpc\\Signup\\Controller' => \User\V1\Rpc\Signup\SignupControllerFactory::class,
+            'User\\V1\\Rpc\\Me\\Controller' => \User\V1\Rpc\Me\MeControllerFactory::class,
+            'User\\V1\\Rpc\\UserActivation\\Controller' => \User\V1\Rpc\UserActivation\UserActivationControllerFactory::class,
+            'User\\V1\\Rpc\\ResetPasswordConfirmEmail\\Controller' => \User\V1\Rpc\ResetPasswordConfirmEmail\ResetPasswordConfirmEmailControllerFactory::class,
+            'User\\V1\\Rpc\\ResetPasswordNewPassword\\Controller' => \User\V1\Rpc\ResetPasswordNewPassword\ResetPasswordNewPasswordControllerFactory::class,
         ],
     ],
     'view_manager' => [
@@ -51,7 +62,7 @@ return [
             'user.rpc.signup' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/api/signup',
+                    'route' => '/api/v1/user/signup',
                     'defaults' => [
                         'controller' => 'User\\V1\\Rpc\\Signup\\Controller',
                         'action' => 'signup',
@@ -61,7 +72,7 @@ return [
             'user.rest.profile' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/api/profile[/:profile_id]',
+                    'route' => '/api/v1/user/profile[/:uuid]',
                     'defaults' => [
                         'controller' => 'User\\V1\\Rest\\Profile\\Controller',
                     ],
@@ -70,7 +81,7 @@ return [
             'user.rpc.me' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/api/me',
+                    'route' => '/api/v1/user/me',
                     'defaults' => [
                         'controller' => 'User\\V1\\Rpc\\Me\\Controller',
                         'action' => 'me',
@@ -80,7 +91,7 @@ return [
             'user.rpc.user-activation' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/api/user/activation',
+                    'route' => '/api/v1/user/activation',
                     'defaults' => [
                         'controller' => 'User\\V1\\Rpc\\UserActivation\\Controller',
                         'action' => 'activation',
@@ -90,7 +101,7 @@ return [
             'user.rpc.reset-password-confirm-email' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/api/resetpassword/email',
+                    'route' => '/api/v1/user/resetpassword/email',
                     'defaults' => [
                         'controller' => 'User\\V1\\Rpc\\ResetPasswordConfirmEmail\\Controller',
                         'action' => 'resetPasswordConfirmEmail',
@@ -100,7 +111,7 @@ return [
             'user.rpc.reset-password-new-password' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/api/resetpassword/newpassword',
+                    'route' => '/api/v1/user/resetpassword/newpassword',
                     'defaults' => [
                         'controller' => 'User\\V1\\Rpc\\ResetPasswordNewPassword\\Controller',
                         'action' => 'resetPasswordNewPassword',
@@ -109,7 +120,7 @@ return [
             ],
         ],
     ],
-    'zf-versioning' => [
+    'api-tools-versioning' => [
         'uri' => [
             0 => 'user.rpc.signup',
             1 => 'user.rest.profile',
@@ -120,7 +131,7 @@ return [
             6 => 'user.rpc.reset-password-new-password',
         ],
     ],
-    'zf-rpc' => [
+    'api-tools-rpc' => [
         'User\\V1\\Rpc\\Signup\\Controller' => [
             'service_name' => 'Signup',
             'http_methods' => [
@@ -157,7 +168,7 @@ return [
             'route_name' => 'user.rpc.reset-password-new-password',
         ],
     ],
-    'zf-content-negotiation' => [
+    'api-tools-content-negotiation' => [
         'controllers' => [
             'User\\V1\\Rpc\\Signup\\Controller' => 'Json',
             'User\\V1\\Rest\\Profile\\Controller' => 'HalJson',
@@ -169,61 +180,49 @@ return [
         'accept_whitelist' => [
             'User\\V1\\Rpc\\Signup\\Controller' => [
                 0 => 'application/json',
-                1 => 'application/vnd.aqilix.bootstrap.v1+json',
             ],
             'User\\V1\\Rest\\Profile\\Controller' => [
                 0 => 'application/hal+json',
                 1 => 'application/json',
-                2 => 'application/vnd.aqilix.bootstrap.v1+json',
             ],
             'User\\V1\\Rpc\\Me\\Controller' => [
                 0 => 'application/json',
-                1 => 'application/vnd.aqilix.bootstrap.v1+json',
             ],
             'User\\V1\\Rpc\\UserActivation\\Controller' => [
                 0 => 'application/json',
-                1 => 'application/vnd.aqilix.bootstrap.v1+json',
             ],
             'User\\V1\\Rpc\\ResetPasswordConfirmEmail\\Controller' => [
-                0 => 'application/vnd.user.v1+json',
-                1 => 'application/json',
-                2 => 'application/*+json',
+                0 => 'application/json',
+                1 => 'application/*+json',
             ],
             'User\\V1\\Rpc\\ResetPasswordNewPassword\\Controller' => [
                 0 => 'application/json',
-                1 => 'application/vnd.aqilix.bootstrap.v1+json',
             ],
         ],
         'content_type_whitelist' => [
             'User\\V1\\Rpc\\Signup\\Controller' => [
                 0 => 'application/json',
-                1 => 'application/vnd.aqilix.bootstrap.v1.json',
             ],
             'User\\V1\\Rest\\Profile\\Controller' => [
                 0 => 'application/json',
-                1 => 'application/vnd.aqilix.bootstrap.v1+json',
-                2 => 'application/hal+json',
-                3 => 'multipart/form-data',
+                1 => 'application/hal+json',
+                2 => 'multipart/form-data',
             ],
             'User\\V1\\Rpc\\Me\\Controller' => [
                 0 => 'application/json',
-                1 => 'application/vnd.aqilix.bootstrap.v1+json',
             ],
             'User\\V1\\Rpc\\UserActivation\\Controller' => [
                 0 => 'application/json',
-                1 => 'application/vnd.aqilix.bootstrap.v1+json',
             ],
             'User\\V1\\Rpc\\ResetPasswordConfirmEmail\\Controller' => [
-                0 => 'application/vnd.user.v1+json',
-                1 => 'application/json',
+                0 => 'application/json',
             ],
             'User\\V1\\Rpc\\ResetPasswordNewPassword\\Controller' => [
                 0 => 'application/json',
-                1 => 'application/vnd.aqilix.bootstrap.v1+json',
             ],
         ],
     ],
-    'zf-content-validation' => [
+    'api-tools-content-validation' => [
         'User\\V1\\Rpc\\Signup\\Controller' => [
             'input_filter' => 'User\\V1\\Rpc\\Signup\\Validator',
         ],
@@ -246,7 +245,7 @@ return [
                 'required' => true,
                 'validators' => [
                     0 => [
-                        'name' => \Zend\Validator\EmailAddress::class,
+                        'name' => \Laminas\Validator\EmailAddress::class,
                         'options' => [
                             'message' => 'Email Address Required',
                         ],
@@ -254,7 +253,7 @@ return [
                 ],
                 'filters' => [
                     0 => [
-                        'name' => \Zend\Filter\StringTrim::class,
+                        'name' => \Laminas\Filter\StringTrim::class,
                         'options' => [],
                     ],
                 ],
@@ -267,13 +266,13 @@ return [
                 'required' => true,
                 'validators' => [
                     0 => [
-                        'name' => \Zend\I18n\Validator\Alnum::class,
+                        'name' => \Laminas\I18n\Validator\Alnum::class,
                         'options' => [
                             'message' => 'Password should contain alpha numeric string',
                         ],
                     ],
                     1 => [
-                        'name' => \Zend\Validator\StringLength::class,
+                        'name' => \Laminas\Validator\StringLength::class,
                         'options' => [
                             'min' => '8',
                         ],
@@ -292,13 +291,13 @@ return [
                 'validators' => [],
                 'filters' => [
                     0 => [
-                        'name' => \Zend\Filter\StringTrim::class,
+                        'name' => \Laminas\Filter\StringTrim::class,
                         'options' => [
                             'charlist' => '!,@,#,$,%,^,&,*,(,),-,_,+,=,|,],},{,[,:,;,:',
                         ],
                     ],
                     1 => [
-                        'name' => \Zend\Filter\StripTags::class,
+                        'name' => \Laminas\Filter\StripTags::class,
                         'options' => [],
                     ],
                 ],
@@ -312,13 +311,13 @@ return [
                 'validators' => [],
                 'filters' => [
                     0 => [
-                        'name' => \Zend\Filter\StringTrim::class,
+                        'name' => \Laminas\Filter\StringTrim::class,
                         'options' => [
                             'charlist' => '!,@,#,$,%,^,&,*,(,),-,_,+,=,|,],},{,[,:,;,:',
                         ],
                     ],
                     1 => [
-                        'name' => \Zend\Filter\StripTags::class,
+                        'name' => \Laminas\Filter\StripTags::class,
                         'options' => [],
                     ],
                 ],
@@ -330,7 +329,7 @@ return [
                 'required' => true,
                 'validators' => [
                     0 => [
-                        'name' => \Zend\Validator\Date::class,
+                        'name' => \Laminas\Validator\Date::class,
                         'options' => [
                             'format' => 'Y-m-d',
                         ],
@@ -347,13 +346,13 @@ return [
                 'validators' => [],
                 'filters' => [
                     0 => [
-                        'name' => \Zend\Filter\StringTrim::class,
+                        'name' => \Laminas\Filter\StringTrim::class,
                         'options' => [
                             'charlist' => '!,@,#,$,%,^,&,*,(,),-,_,+,=,|,],},{,[,:,;,:',
                         ],
                     ],
                     1 => [
-                        'name' => \Zend\Filter\StripNewlines::class,
+                        'name' => \Laminas\Filter\StripNewlines::class,
                         'options' => [],
                     ],
                 ],
@@ -366,13 +365,13 @@ return [
                 'validators' => [],
                 'filters' => [
                     0 => [
-                        'name' => \Zend\Filter\StringTrim::class,
+                        'name' => \Laminas\Filter\StringTrim::class,
                         'options' => [
                             'charlist' => '!,@,#,$,%,^,&,*,(,),-,_,+,=,|,],},{,[,:,;,:',
                         ],
                     ],
                     1 => [
-                        'name' => \Zend\Filter\StripNewlines::class,
+                        'name' => \Laminas\Filter\StripNewlines::class,
                         'options' => [],
                     ],
                 ],
@@ -385,13 +384,13 @@ return [
                 'validators' => [],
                 'filters' => [
                     0 => [
-                        'name' => \Zend\Filter\StringTrim::class,
+                        'name' => \Laminas\Filter\StringTrim::class,
                         'options' => [
                             'charlist' => '!,@,#,$,%,^,&,*,(,),-,_,+,=,|,],},{,[,:,;,:',
                         ],
                     ],
                     1 => [
-                        'name' => \Zend\Filter\StripNewlines::class,
+                        'name' => \Laminas\Filter\StripNewlines::class,
                         'options' => [],
                     ],
                 ],
@@ -403,7 +402,7 @@ return [
                 'required' => true,
                 'validators' => [
                     0 => [
-                        'name' => \Zend\I18n\Validator\PostCode::class,
+                        'name' => \Laminas\I18n\Validator\PostCode::class,
                         'options' => [
                             'message' => 'Postal code should be 5 digit numeric characters',
                         ],
@@ -411,7 +410,7 @@ return [
                 ],
                 'filters' => [
                     0 => [
-                        'name' => \Zend\Filter\Digits::class,
+                        'name' => \Laminas\Filter\Digits::class,
                         'options' => [],
                     ],
                 ],
@@ -424,13 +423,13 @@ return [
                 'validators' => [],
                 'filters' => [
                     0 => [
-                        'name' => \Zend\Filter\StringTrim::class,
+                        'name' => \Laminas\Filter\StringTrim::class,
                         'options' => [
                             'charlist' => '!,@,#,$,%,^,&,*,(,),-,_,+,=,|,],},{,[,:,;,:',
                         ],
                     ],
                     1 => [
-                        'name' => \Zend\Filter\StripNewlines::class,
+                        'name' => \Laminas\Filter\StripNewlines::class,
                         'options' => [],
                     ],
                 ],
@@ -441,14 +440,14 @@ return [
                 'required' => false,
                 'validators' => [
                     0 => [
-                        'name' => \Zend\Validator\File\Extension::class,
+                        'name' => \Laminas\Validator\File\Extension::class,
                         'options' => [
                             'extension' => 'png, jpg, jpeg',
                             'message' => 'File extension not match',
                         ],
                     ],
                     1 => [
-                        'name' => \Zend\Validator\File\MimeType::class,
+                        'name' => \Laminas\Validator\File\MimeType::class,
                         'options' => [
                             'mimeType' => 'image/png, image/jpeg',
                             'message' => 'File type extension not match',
@@ -457,7 +456,7 @@ return [
                 ],
                 'filters' => [
                     0 => [
-                        'name' => \Zend\Filter\File\RenameUpload::class,
+                        'name' => \Laminas\Filter\File\RenameUpload::class,
                         'options' => [
                             'use_upload_extension' => true,
                             'randomize' => true,
@@ -468,7 +467,7 @@ return [
                 'name' => 'photo',
                 'description' => 'Photo',
                 'field_type' => 'File',
-                'type' => \Zend\InputFilter\FileInput::class,
+                'type' => \Laminas\InputFilter\FileInput::class,
                 'error_message' => 'Photo is not valid',
             ],
         ],
@@ -487,7 +486,7 @@ return [
                 'required' => true,
                 'validators' => [
                     0 => [
-                        'name' => \Zend\Validator\EmailAddress::class,
+                        'name' => \Laminas\Validator\EmailAddress::class,
                         'options' => [
                             'message' => 'Email Address Required',
                         ],
@@ -495,7 +494,7 @@ return [
                 ],
                 'filters' => [
                     0 => [
-                        'name' => \Zend\Filter\StringTrim::class,
+                        'name' => \Laminas\Filter\StringTrim::class,
                         'options' => [],
                     ],
                 ],
@@ -511,7 +510,7 @@ return [
                 'validators' => [],
                 'filters' => [
                     0 => [
-                        'name' => \Zend\Filter\StringTrim::class,
+                        'name' => \Laminas\Filter\StringTrim::class,
                         'options' => [],
                     ],
                 ],
@@ -523,11 +522,11 @@ return [
                 'required' => true,
                 'validators' => [
                     0 => [
-                        'name' => \Zend\I18n\Validator\Alnum::class,
+                        'name' => \Laminas\I18n\Validator\Alnum::class,
                         'options' => [],
                     ],
                     1 => [
-                        'name' => \Zend\Validator\StringLength::class,
+                        'name' => \Laminas\Validator\StringLength::class,
                         'options' => [
                             'min' => '8',
                         ],
@@ -542,17 +541,17 @@ return [
                 'required' => true,
                 'validators' => [
                     0 => [
-                        'name' => \Zend\I18n\Validator\Alnum::class,
+                        'name' => \Laminas\I18n\Validator\Alnum::class,
                         'options' => [],
                     ],
                     1 => [
-                        'name' => \Zend\Validator\StringLength::class,
+                        'name' => \Laminas\Validator\StringLength::class,
                         'options' => [
                             'min' => '8',
                         ],
                     ],
                     2 => [
-                        'name' => \Zend\Validator\Identical::class,
+                        'name' => \Laminas\Validator\Identical::class,
                         'options' => [
                             'token' => 'newPassword',
                         ],
@@ -565,11 +564,11 @@ return [
             ],
         ],
     ],
-    'zf-rest' => [
+    'api-tools-rest' => [
         'User\\V1\\Rest\\Profile\\Controller' => [
             'listener' => \User\V1\Rest\Profile\ProfileResource::class,
             'route_name' => 'user.rest.profile',
-            'route_identifier_name' => 'profile_id',
+            'route_identifier_name' => 'uuid',
             'collection_name' => 'profile',
             'entity_http_methods' => [
                 0 => 'GET',
@@ -580,31 +579,33 @@ return [
                 0 => 'GET',
                 1 => 'POST',
             ],
-            'collection_query_whitelist' => [],
+            'collection_query_whitelist' => [
+                0 => 'limit',
+            ],
             'page_size' => 25,
-            'page_size_param' => null,
+            'page_size_param' => 'limit',
             'entity_class' => \User\Entity\UserProfile::class,
             'collection_class' => \User\V1\Rest\Profile\ProfileCollection::class,
             'service_name' => 'Profile',
         ],
     ],
-    'zf-hal' => [
+    'api-tools-hal' => [
         'metadata_map' => [
             \User\Entity\UserProfile::class => [
                 'entity_identifier_name' => 'uuid',
                 'route_name' => 'user.rest.profile',
-                'route_identifier_name' => 'profile_id',
+                'route_identifier_name' => 'uuid',
                 'hydrator' => 'User\\Hydrator\\UserProfile',
             ],
             \User\V1\Rest\Profile\ProfileCollection::class => [
                 'entity_identifier_name' => 'uuid',
                 'route_name' => 'user.rest.profile',
-                'route_identifier_name' => 'profile_id',
+                'route_identifier_name' => 'uuid',
                 'is_collection' => true,
             ],
         ],
     ],
-    'zf-mvc-auth' => [
+    'api-tools-mvc-auth' => [
         'authorization' => [
             'User\\V1\\Rest\\Profile\\Controller' => [
                 'collection' => [
@@ -630,39 +631,6 @@ return [
                         'PUT' => false,
                         'PATCH' => false,
                         'DELETE' => false,
-                    ],
-                ],
-            ],
-        ],
-    ],
-    'console' => [
-        'router' => [
-            'routes' => [
-                'v1-send-welcome-email' => [
-                    'options' => [
-                        'route' => 'v1 user send-welcome-email <emailAddress> <activationCode>',
-                        'defaults' => [
-                            'controller' => \User\V1\Console\Controller\EmailController::class,
-                            'action' => 'sendWelcomeEmail',
-                        ],
-                    ],
-                ],
-                'v1-send-activation-email' => [
-                    'options' => [
-                        'route' => 'v1 user send-activation-email <emailAddress>',
-                        'defaults' => [
-                            'controller' => \User\V1\Console\Controller\EmailController::class,
-                            'action' => 'sendActivationEmail',
-                        ],
-                    ],
-                ],
-                'v1-send-resetpassword-email' => [
-                    'options' => [
-                        'route' => 'v1 user send-resetpassword-email <emailAddress> <resetPasswordKey>',
-                        'defaults' => [
-                            'controller' => \User\V1\Console\Controller\EmailController::class,
-                            'action' => 'sendResetPasswordEmail',
-                        ],
                     ],
                 ],
             ],

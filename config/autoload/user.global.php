@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
@@ -19,24 +20,26 @@
 return [
     'user' => [
         'photo' => [
-            'backup_dir' => 'data/photo'
+            'base_url'      => 'http://photo.example.com',
+            'backup_dir'    => 'data/photo',
+            'bucket'        => 'photo',
         ],
         'email'  => [
             'welcome' => [
                 'from' => '',
                 'name' => '',
-                'subject' => ''
+                'subject' => '',
             ],
             'user_activation' => [
                 'from' => '',
                 'name' => '',
-                'subject' => ''
+                'subject' => '',
             ],
             'reset_password' => [
                 'from' => '',
                 'name' => '',
-                'subject' => ''
+                'subject' => '',
             ],
-        ]
-    ]
+        ],
+    ],
 ];

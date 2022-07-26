@@ -1,20 +1,24 @@
 <?php
+
 namespace User\Service\Listener;
 
-use Zend\Mvc\MvcEvent;
+use Laminas\Http\Response;
 
 class UnauthorizedUserListener
 {
     /**
      * Check response with 401 status code
      *
-     * @param  MvcEvent
+     * @param  \Laminas\Mvc\MvcEvent  $ev
      */
-    public function __invoke(MvcEvent $mvcEvent)
+    public function __invoke($ev)
     {
-        $mvcResponse = $mvcEvent->getResponse();
-        if ($mvcResponse instanceof \Zend\Http\Response && $mvcResponse->getStatusCode() === \Zend\Http\Response::STATUS_CODE_401) {
-            $mvcResponse->getHeaders()->addHeaderLine('Www-Authenticate', 'Bearer realm="Service"');
+        $response = $ev->getResponse();
+        if (
+            $response instanceof Response
+            && $response->getStatusCode() === Response::STATUS_CODE_401
+        ) {
+            $response->getHeaders()->addHeaderLine('Www-Authenticate', 'Bearer realm="Service"');
         }
 
         return;

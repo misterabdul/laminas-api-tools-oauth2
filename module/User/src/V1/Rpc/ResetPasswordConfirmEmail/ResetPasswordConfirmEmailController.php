@@ -1,30 +1,48 @@
 <?php
+
 namespace User\V1\Rpc\ResetPasswordConfirmEmail;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Json\Json;
-use ZF\ApiProblem\ApiProblemResponse;
-use ZF\ApiProblem\ApiProblem;
-use ZF\Hal\View\HalJsonModel;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\ApiProblem\ApiProblemResponse;
+use Laminas\ApiTools\Hal\View\HalJsonModel;
+use Laminas\Json\Json;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class ResetPasswordConfirmEmailController extends AbstractActionController
 {
+    /**
+     * @var \Laminas\InputFilter\InputFilterInterface
+     */
     protected $confirmEmailValidator;
 
+    /**
+     * @var \User\V1\Service\ResetPassword
+     */
     protected $resetPasswordService;
 
-    public function __construct($confirmEmailValidator, $resetPasswordService)
-    {
-        $this->setConfirmEmailValidator($confirmEmailValidator);
-        $this->setResetPasswordService($resetPasswordService);
+    /**
+     * @param  \Laminas\Validator\ValidatorInterface  $confirmEmailValidator
+     * @param  \User\V1\Service\ResetPassword  $resetPasswordService
+     */
+    public function __construct(
+        $confirmEmailValidator,
+        $resetPasswordService
+    ) {
+        $this->confirmEmailValidator = $confirmEmailValidator;
+        $this->resetPasswordService = $resetPasswordService;
     }
 
+    /**
+     * @return mixed
+     */
     public function resetPasswordConfirmEmailAction()
     {
-        $this->getConfirmEmailValidator()->setData(Json::decode($this->getRequest()->getContent(), true));
         try {
-            $resetPassword = $this->getResetPasswordService();
-            $resetPassword->create($this->getConfirmEmailValidator()->getValues());
+            $this->confirmEmailValidator
+                ->setData(Json::decode($this->getRequest()->getContent(), true));
+            $this->resetPasswordService
+                ->create($this->confirmEmailValidator->getValues());
+
             return new HalJsonModel([]);
         } catch (\Exception $e) {
             return new ApiProblemResponse(new ApiProblem(
@@ -35,37 +53,5 @@ class ResetPasswordConfirmEmailController extends AbstractActionController
                 ['validation_messages' => ['emailAddress' => [$e->getMessage()]]]
             ));
         }
-    }
-
-    /**
-     * @return $confirmEmailValidator
-     */
-    public function getConfirmEmailValidator()
-    {
-        return $this->confirmEmailValidator;
-    }
-
-    /**
-     * @param field_type $confirmEmailValidator
-     */
-    public function setConfirmEmailValidator($confirmEmailValidator)
-    {
-        $this->confirmEmailValidator = $confirmEmailValidator;
-    }
-
-    /**
-     * @return the $resetPasswordService
-     */
-    public function getResetPasswordService()
-    {
-        return $this->resetPasswordService;
-    }
-
-    /**
-     * @param field_type $resetPasswordService
-     */
-    public function setResetPasswordService($resetPasswordService)
-    {
-        $this->resetPasswordService = $resetPasswordService;
     }
 }

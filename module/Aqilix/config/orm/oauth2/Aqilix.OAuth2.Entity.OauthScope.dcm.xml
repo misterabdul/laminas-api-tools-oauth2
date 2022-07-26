@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="Aqilix\OAuth2\Entity\OauthScope" table="oauth_scopes">
+    <indexes>
+      <index name="oauthscope_client_idx" columns="client_id"/>
+    </indexes>
+
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+
+    <field name="type" type="string" column="type" length="255" nullable="false">
+      <options>
+        <option name="fixed"/>
+        <option name="default">supported</option>
+      </options>
+    </field>
+    <field name="scope" type="string" column="scope" length="2000" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="isDefault" type="smallint" column="is_default" nullable="true">
+      <options>
+        <option name="unsigned"/>
+      </options>
+    </field>
+
+    <many-to-one field="client" target-entity="Aqilix\OAuth2\Entity\OauthClient" fetch="EAGER">
+      <join-columns>
+        <join-column name="client_id" referenced-column-name="client_id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

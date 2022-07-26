@@ -1,8 +1,8 @@
 <?php
+
 namespace User\V1\Hydrator\Strategy;
 
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
  * Hydrator Strategy for Photo
@@ -12,14 +12,17 @@ use Interop\Container\ContainerInterface;
 class PhotoStrategyFactory implements FactoryInterface
 {
     /**
-     * Create a service for DoctrineObject Hydrator
-     *
-     * @see \Zend\ServiceManager\FactoryInterface::createService()
+     * @param  \Psr\Container\ContainerInterface  $container
+     * @param  string  $requestedName
+     * @param  array|null  $options
+     * @return object
+     * @throws \Laminas\ServiceManager\Exception\ServiceNotFoundException If unable to resolve the service.
+     * @throws \Laminas\ServiceManager\Exception\ServiceNotCreatedException If an exception is raised when creating a service.
+     * @throws \Psr\Container\ContainerExceptionInterface If any other error occurs.
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke($container, $requestedName, $options = null)
     {
         $config = $container->get('Config')['user']['photo'];
-        $strategy = new PhotoStrategy($config);
-        return $strategy;
+        return new PhotoStrategy($config);
     }
 }

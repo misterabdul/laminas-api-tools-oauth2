@@ -1,23 +1,17 @@
 <?php
+
 namespace User\V1\Notification\Email\Listener;
 
-use Zend\EventManager\ListenerAggregateInterface;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateTrait;
-use Psr\Log\LoggerAwareTrait;
 use User\V1\SignupEvent;
 
-class SignupEventListener extends AbstractListener implements ListenerAggregateInterface
+class SignupEventListener extends Listener
 {
-    use ListenerAggregateTrait;
-
-    use LoggerAwareTrait;
-
     /**
-     * (non-PHPdoc)
-     * @see \Zend\EventManager\ListenerAggregateInterface::attach()
+     * @param  \Laminas\EventManager\EventManagerInterface  $events
+     * @param  int  $priority
+     * @return void
      */
-    public function attach(EventManagerInterface $events, $priority = 1)
+    public function attach($events, $priority = 1)
     {
         $this->listeners[] = $events->attach(
             SignupEvent::EVENT_INSERT_USER_SUCCESS,
@@ -29,19 +23,20 @@ class SignupEventListener extends AbstractListener implements ListenerAggregateI
     /**
      * Run Console to Send Activation Email
      *
-     * @param  EventInterface $event
-     * @return int
+     * @param  \User\V1\SignupEvent  $event
+     * @return void
      */
-    public function sendWelcomeEmail(SignupEvent $event)
+    public function sendWelcomeEmail($event)
     {
         $emailAddress = $event->getUserEntity()->getUsername();
         $userActivationKey = $event->getUserActivationKey();
-        // command: v1 user send-welcome-email <emailAddress> <activationCode>
+        // command: laminas-cli user:send-welcome-email <emailAddress> <activationCode>
         $cli = $this->phpProcessBuilder
-                ->setArguments(['v1', 'user', 'send-welcome-email', $emailAddress, $userActivationKey])
-                ->getProcess();
+            ->setArguments(['v1', 'user', 'send-welcome-email', $emailAddress, $userActivationKey])
+            ->getProcess();
         $cli->start();
         $pid = $cli->getPid();
+
         $this->logger->log(
             \Psr\Log\LogLevel::DEBUG,
             "{function} {pid} {commandline}",
@@ -51,6 +46,5 @@ class SignupEventListener extends AbstractListener implements ListenerAggregateI
                 "pid" => $pid
             ]
         );
-        return $pid;
     }
 }
