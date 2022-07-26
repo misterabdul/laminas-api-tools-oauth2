@@ -17,6 +17,7 @@
         "issues": "https://github.com/misterabdul/laminas-api-tools-oauth2/issues"
     },
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "config": {
         "process-timeout": 5000,
         "sort-packages": true,
