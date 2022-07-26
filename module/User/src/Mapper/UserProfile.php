@@ -38,15 +38,19 @@ class UserProfile extends Mapper
      */
     public function fetchOneByOauthUsername($username)
     {
-        $qb = $this->getEntityRepository()->createQueryBuilder('t');
-        $qb->innerJoin('t.user', 'u');
+        try {
+            $qb = $this->getEntityRepository()->createQueryBuilder('t');
+            $qb->innerJoin('t.user', 'u');
 
-        $qb->where('u.username = :username')
-            ->setParameter('username', $username);
+            $qb->where('u.username = :username')
+                ->setParameter('username', $username);
 
-        $qb->setMaxResults(1);
-        $query = $qb->getQuery();
+            $qb->setMaxResults(1);
+            $query = $qb->getQuery();
 
-        return $query->getSingleResult();
+            return $query->getSingleResult();
+        } catch (\Doctrine\ORM\NoResultException $ex) {
+            return null;
+        }
     }
 }

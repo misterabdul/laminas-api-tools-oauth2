@@ -24,6 +24,7 @@ return [
             \User\Service\Listener\AuthActiveUserListener::class => \User\Service\Listener\AuthActiveUserListenerFactory::class,
             \User\Service\Listener\UnauthorizedUserListener::class => \User\Service\Listener\UnauthorizedUserListenerFactory::class,
             \User\V1\Hydrator\Strategy\PhotoStrategy::class => \User\V1\Hydrator\Strategy\PhotoStrategyFactory::class,
+            \User\V1\Command\GenerateAdminUser::class => \User\V1\Command\GenerateAdminUserFactory::class,
         ],
         'abstract_factories' => [
             0 => \User\Mapper\MapperFactory::class,
@@ -39,6 +40,7 @@ return [
             'user:v1:send-welcome-email' => \User\V1\Command\SendWelcomeEmail::class,
             'user:v1:send-activation-email' => \User\V1\Command\SendActivationEmail::class,
             'user:v1:send-resetpassword-email' => \User\V1\Command\SendResetPasswordEmail::class,
+            'user:v1:generate-admin-user' => \User\V1\Command\GenerateAdminUser::class,
         ],
     ],
     'controllers' => [
